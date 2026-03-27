@@ -1,0 +1,47 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Root local tooling caches
+.dotnet/
+.nuget/
+
+# Node / frontend artifacts
+financeManagementSystemFrontend/node_modules/
+financeManagementSystemFrontend/dist/
+financeManagementSystemFrontend/.vite/
+
+# .NET / backend artifacts
+**/bin/
+**/obj/
+financeManagementSystemBackend/.config/
+financeManagementSystemBackend/.dotnet/
+financeManagementSystemBackend/.nuget/
+financeManagementSystemBackend/.tmp/
+financeManagementSystemBackend/src/FinPilot.Api/App_Data/
+financeManagementSystemBackend/src/FinPilot.Api/wwwroot/
+financeManagementSystemBackend/api.stdout.log
+financeManagementSystemBackend/api.stderr.log
+financeManagementSystemBackend/build.log
+financeManagementSystemBackend/buildlog.txt
+financeManagementSystemBackend/debug-login.stdout.log
+financeManagementSystemBackend/debug-login.stderr.log
+financeManagementSystemBackend/run-api.out.log
+financeManagementSystemBackend/run-api.err.log
+financeManagementSystemBackend/tmp-write-test.txt
+
+# Local env / secrets
+.env
+*.local
+
+# Test / coverage artifacts
+coverage/
+TestResults/
+*.trx
+
+# Logs
+*.log
