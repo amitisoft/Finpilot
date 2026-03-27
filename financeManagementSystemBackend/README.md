@@ -57,9 +57,10 @@ dotnet test FinPilot.sln
 ## Azure deployment notes
 FinPilot is Azure-ready for the simplest deployment model: a single **Azure App Service** serving both the API and the built frontend bundle from `wwwroot`.
 
+For the hackathon deployment path, caching now uses in-memory distributed cache, so Redis is not required.
+
 Key production app settings:
 - `ConnectionStrings__Postgres`
-- `Redis__ConnectionString`
 - `Jwt__Issuer`
 - `Jwt__Audience`
 - `Jwt__SecretKey`

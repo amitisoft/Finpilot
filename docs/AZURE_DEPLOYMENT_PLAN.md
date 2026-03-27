@@ -6,10 +6,10 @@ Deploy the current FinPilot codebase to Azure with the least operational complex
 ## Target architecture
 - **Azure App Service (Linux, .NET 8)**: serves the ASP.NET Core API and the built React frontend from `wwwroot`
 - **Azure Database for PostgreSQL Flexible Server**: primary relational database
-- **Azure Managed Redis / Azure Cache for Redis**: dashboard and insights caching
+- **In-memory distributed cache**: keeps dashboard and insights caching self-contained for hackathon deployment
 
 ## Why this architecture
-The frontend already builds into `financeManagementSystemBackend/src/FinPilot.Api/wwwroot`, so a single App Service is the cleanest deployment target for the current repo. It avoids extra frontend hosting work and removes cross-origin complexity unless a split deployment is introduced later.
+The frontend already builds into `financeManagementSystemBackend/src/FinPilot.Api/wwwroot`, so a single App Service is the cleanest deployment target for the current repo. It avoids extra frontend hosting work and removes cross-origin complexity unless a split deployment is introduced later. Redis has been removed from the hackathon deployment path so the app can run with only App Service and PostgreSQL.
 
 ## Branch strategy for deployment
 - **develop**: active implementation branch
@@ -39,7 +39,6 @@ This keeps hackathon development simple: iterate on `develop`, merge to `main` w
 2. App Service Plan
 3. Web App (.NET 8, Linux)
 4. Azure Database for PostgreSQL Flexible Server
-5. Azure Managed Redis / Azure Cache for Redis
 
 ## Required GitHub repo settings
 ### Secret
@@ -51,7 +50,6 @@ This keeps hackathon development simple: iterate on `develop`, merge to `main` w
 ## Required Azure App Service application settings
 - `ASPNETCORE_ENVIRONMENT=Production`
 - `ConnectionStrings__Postgres=Host=<server>.postgres.database.azure.com;Port=5432;Database=<db>;Username=<user>;Password=<password>;SSL Mode=Require;Trust Server Certificate=true`
-- `Redis__ConnectionString=<redis-connection-string>`
 - `Jwt__Issuer=FinPilot.Api`
 - `Jwt__Audience=FinPilot.Client`
 - `Jwt__SecretKey=<very-long-random-secret>`
@@ -76,10 +74,10 @@ This keeps hackathon development simple: iterate on `develop`, merge to `main` w
 - register/login works
 - database migrations run on startup
 - dashboard loads with seeded/default data
-- logs show successful PostgreSQL and Redis connections
+- logs show successful PostgreSQL connection
 
 ## Later enhancements (not required for hackathon)
 - Split frontend to Azure Static Web Apps
 - Use Key Vault references for secrets
-- Replace file-system Data Protection with Blob/Redis-backed persistence for scale-out
+- Replace file-system Data Protection with Blob-backed or other shared-key persistence for scale-out
 - Add staging slot deployment from `develop`

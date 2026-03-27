@@ -6,5 +6,4 @@ if (-not (Test-Path $podman)) {
 }
 
 & $podman stop finpilot-postgres 2>$null | Out-Null
-& $podman stop finpilot-redis 2>$null | Out-Null
 & $podman pod stop finpilot-dev 2>$null | Out-Null

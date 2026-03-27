@@ -11,3 +11,4 @@
 - On assistant pages, do not leave hidden or secondary context controls visually competing with the conversation. If the user asks for a chatbot experience, keep the main pane to messages plus composer and move only lightweight prompt help to the side rail.
 
 - Do not introduce paid external AI providers or assume key-based integrations are acceptable without explicit user approval. If the user wants a self-contained or hackathon-safe setup, stay local/deterministic unless they opt in.
+- For hackathon deployments, do not keep optional infrastructure like Redis as a hard dependency unless the user explicitly wants that extra service. Prefer simpler in-memory fallbacks first.

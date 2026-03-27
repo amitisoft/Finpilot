@@ -2,12 +2,10 @@ using FinPilot.Domain.Entities;
 using FinPilot.Domain.Enums;
 using FinPilot.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using StackExchange.Redis;
 
 var email = args.FirstOrDefault() ?? "abhishek.shukla@amiti.in";
 const string marker = "coach-setup-seed";
 const string connectionString = "Host=localhost;Port=5432;Database=finpilot;Username=postgres;Password=postgres";
-const string redisConnectionString = "localhost:6379";
 
 var dbOptions = new DbContextOptionsBuilder<FinPilotDbContext>()
     .UseNpgsql(connectionString)
@@ -200,29 +198,7 @@ foreach (var item in budgetItems)
 
 await dbContext.SaveChangesAsync();
 
-try
-{
-    await using var redis = await ConnectionMultiplexer.ConnectAsync(redisConnectionString);
-    var database = redis.GetDatabase();
-    var server = redis.GetServer(redis.GetEndPoints().First());
-    foreach (var pattern in new[]
-    {
-        $"dashboard:*:{user.Id}",
-        $"dashboard:*:{user.Id}:*",
-        $"insights:*:{user.Id}",
-        $"insights:*:{user.Id}:*"
-    })
-    {
-        foreach (var key in server.Keys(pattern: pattern))
-        {
-            await database.KeyDeleteAsync(key);
-        }
-    }
-}
-catch (Exception exception)
-{
-    Console.WriteLine($"Warning: cache invalidation skipped: {exception.Message}");
-}
+Console.WriteLine("In-memory cache will refresh naturally on the next app request.");
 
 Console.WriteLine($"Seeded coach setup data for {email}");
 Console.WriteLine($"UserId: {user.Id}");

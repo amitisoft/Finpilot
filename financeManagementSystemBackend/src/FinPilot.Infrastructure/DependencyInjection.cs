@@ -12,7 +12,6 @@ using FinPilot.Application.Interfaces.Transactions;
 using FinPilot.Domain.Entities;
 using FinPilot.Infrastructure.Agents;
 using FinPilot.Infrastructure.Auth;
-using FinPilot.Infrastructure.Configuration;
 using FinPilot.Infrastructure.Finance;
 using FinPilot.Infrastructure.Insights;
 using FinPilot.Infrastructure.Persistence;
@@ -30,14 +29,12 @@ public static class DependencyInjection
     {
         var connectionString = ResolvePostgresConnectionString(configuration);
         services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
-        services.Configure<RedisOptions>(configuration.GetSection(RedisOptions.SectionName));
 
         services.AddDbContext<FinPilotDbContext>(options =>
             options.UseNpgsql(connectionString, npgsql =>
                 npgsql.MigrationsAssembly(typeof(FinPilotDbContext).Assembly.FullName)));
 
-        var redisConnection = configuration[$"{RedisOptions.SectionName}:ConnectionString"] ?? "localhost:6379";
-        services.AddStackExchangeRedisCache(options => options.Configuration = redisConnection);
+        services.AddDistributedMemoryCache();
 
         services.AddScoped<IDateTimeProvider, SystemDateTimeProvider>();
         services.AddScoped<ITokenService, TokenService>();
