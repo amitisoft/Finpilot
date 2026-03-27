@@ -1,0 +1,52 @@
+name: validate-finpilot
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+  pull_request:
+    branches:
+      - main
+      - develop
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: 8.0.x
+  NODE_VERSION: 20
+  FRONTEND_DIR: financeManagementSystemFrontend
+  BACKEND_SOLUTION: financeManagementSystemBackend/FinPilot.sln
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: ${{ env.FRONTEND_DIR }}/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: ${{ env.FRONTEND_DIR }}
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: ${{ env.FRONTEND_DIR }}
+        run: npm run build
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore backend dependencies
+        run: dotnet restore ${{ env.BACKEND_SOLUTION }}
+
+      - name: Run backend test suite
+        run: dotnet test ${{ env.BACKEND_SOLUTION }} --configuration Release --no-restore

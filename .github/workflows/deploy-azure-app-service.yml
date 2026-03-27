@@ -1,0 +1,59 @@
+name: deploy-finpilot-app-service
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: 8.0.x
+  NODE_VERSION: 20
+  FRONTEND_DIR: financeManagementSystemFrontend
+  BACKEND_SOLUTION: financeManagementSystemBackend/FinPilot.sln
+  BACKEND_PROJECT: financeManagementSystemBackend/src/FinPilot.Api/FinPilot.Api.csproj
+  PUBLISH_DIR: ${{ github.workspace }}/published-app
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: ${{ env.FRONTEND_DIR }}/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: ${{ env.FRONTEND_DIR }}
+        run: npm ci
+
+      - name: Build frontend bundle into backend wwwroot
+        working-directory: ${{ env.FRONTEND_DIR }}
+        run: npm run build
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore backend dependencies
+        run: dotnet restore ${{ env.BACKEND_SOLUTION }}
+
+      - name: Run backend test suite
+        run: dotnet test ${{ env.BACKEND_SOLUTION }} --configuration Release --no-restore
+
+      - name: Publish backend for Azure App Service
+        run: dotnet publish ${{ env.BACKEND_PROJECT }} --configuration Release --no-restore --output ${{ env.PUBLISH_DIR }}
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: ${{ env.PUBLISH_DIR }}

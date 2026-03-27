@@ -54,3 +54,27 @@ dotnet build FinPilot.sln
 dotnet test FinPilot.sln
 ```
 
+## Azure deployment notes
+FinPilot is Azure-ready for the simplest deployment model: a single **Azure App Service** serving both the API and the built frontend bundle from `wwwroot`.
+
+Key production app settings:
+- `ConnectionStrings__Postgres`
+- `Redis__ConnectionString`
+- `Jwt__Issuer`
+- `Jwt__Audience`
+- `Jwt__SecretKey`
+- `Jwt__AccessTokenMinutes`
+- `Jwt__RefreshTokenDays`
+- `Swagger__Enabled`
+- `CORS_ALLOWED_ORIGINS` (only needed when the frontend is hosted separately)
+
+Branch usage:
+- `develop` -> validation / active work
+- `main` -> Azure deployment branch
+
+GitHub workflows:
+- `.github/workflows/validate-finpilot.yml`
+- `.github/workflows/deploy-azure-app-service.yml`
+
+Detailed checklist / architecture notes:
+- `docs/AZURE_DEPLOYMENT_PLAN.md`

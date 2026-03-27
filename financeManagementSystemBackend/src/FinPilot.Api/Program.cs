@@ -1,5 +1,6 @@
 using System.Text;
 using System.Threading.RateLimiting;
+using FinPilot.Api.Configuration;
 using FinPilot.Api.Middleware;
 using FinPilot.Api.Services;
 using FinPilot.Application.Common;
@@ -13,8 +14,8 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,20 +26,28 @@ builder.Logging.AddDebug();
 var jwtOptions = builder.Configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>()
     ?? throw new InvalidOperationException("JWT configuration is missing.");
 
-var dataProtectionPath = Path.Combine(builder.Environment.ContentRootPath, "App_Data", "DataProtectionKeys");
+var swaggerSettings = builder.Configuration.GetSection(SwaggerSettings.SectionName).Get<SwaggerSettings>()
+    ?? new SwaggerSettings();
+var allowedCorsOrigins = ResolveAllowedCorsOrigins(builder.Configuration);
+var dataProtectionPath = ResolveDataProtectionPath(builder.Environment);
 Directory.CreateDirectory(dataProtectionPath);
 
 builder.Services.AddControllers();
+builder.Services.Configure<CorsSettings>(builder.Configuration.GetSection(CorsSettings.SectionName));
+builder.Services.Configure<SwaggerSettings>(builder.Configuration.GetSection(SwaggerSettings.SectionName));
 
-builder.Services.AddCors(options =>
+if (allowedCorsOrigins.Length > 0)
 {
-    options.AddPolicy("frontend", policy =>
+    builder.Services.AddCors(options =>
     {
-        policy.WithOrigins("http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:4173", "http://127.0.0.1:4173")
-            .AllowAnyHeader()
-            .AllowAnyMethod();
+        options.AddPolicy("frontend", policy =>
+        {
+            policy.WithOrigins(allowedCorsOrigins)
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
     });
-});
+}
 
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
@@ -161,12 +170,17 @@ builder.Services.AddDataProtection()
 var app = builder.Build();
 
 app.UseMiddleware<GlobalExceptionMiddleware>();
-app.UseCors("frontend");
+
+if (allowedCorsOrigins.Length > 0)
+{
+    app.UseCors("frontend");
+}
+
 app.UseDefaultFiles();
 app.UseStaticFiles();
 app.UseRateLimiter();
 
-if (app.Environment.IsDevelopment())
+if (swaggerSettings.Enabled)
 {
     app.UseSwagger();
     app.UseSwaggerUI();
@@ -188,6 +202,38 @@ using (var scope = app.Services.CreateScope())
     await FinPilotDbSeeder.SeedAsync(dbContext);
 }
 
+static string ResolveDataProtectionPath(IHostEnvironment environment)
+{
+    var homeDirectory = Environment.GetEnvironmentVariable("HOME");
+    if (!string.IsNullOrWhiteSpace(homeDirectory))
+    {
+        return Path.Combine(homeDirectory, "site", "data-protection-keys");
+    }
+
+    return Path.Combine(environment.ContentRootPath, "App_Data", "DataProtectionKeys");
+}
+
+static string[] ResolveAllowedCorsOrigins(IConfiguration configuration)
+{
+    var rawOrigins = configuration["CORS_ALLOWED_ORIGINS"];
+    if (!string.IsNullOrWhiteSpace(rawOrigins))
+    {
+        return rawOrigins
+            .Split([',', ';'], StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+    }
+
+    return configuration.GetSection(CorsSettings.SectionName)
+        .Get<CorsSettings>()?
+        .AllowedOrigins?
+        .Where(origin => !string.IsNullOrWhiteSpace(origin))
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .ToArray()
+        ?? [];
+}
+
 app.Run();
 
 public partial class Program;
+
