@@ -47,6 +47,11 @@ This keeps hackathon development simple: iterate on `develop`, merge to `main` w
 ### Variable
 - `AZURE_WEBAPP_NAME`
 
+### Common deployment failure
+- If GitHub Actions shows `No credentials found. Add an Azure login action before this action.`, the publish profile secret is missing or empty.
+- Re-download the publish profile from the Azure Web App and save it as `AZURE_WEBAPP_PUBLISH_PROFILE` in GitHub secrets.
+
+
 ## Required Azure App Service application settings
 - `ASPNETCORE_ENVIRONMENT=Production`
 - `ConnectionStrings__Postgres=Host=<server>.postgres.database.azure.com;Port=5432;Database=<db>;Username=<user>;Password=<password>;SSL Mode=Require;Trust Server Certificate=true`

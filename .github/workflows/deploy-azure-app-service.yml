@@ -51,6 +51,22 @@ jobs:
       - name: Publish backend for Azure App Service
         run: dotnet publish ${{ env.BACKEND_PROJECT }} --configuration Release --no-restore --output ${{ env.PUBLISH_DIR }}
 
+      - name: Validate Azure deployment settings
+        shell: bash
+        env:
+          AZURE_WEBAPP_NAME: ${{ vars.AZURE_WEBAPP_NAME }}
+          AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        run: |
+          if [ -z "$AZURE_WEBAPP_NAME" ]; then
+            echo "::error::Missing GitHub variable AZURE_WEBAPP_NAME. Set it to your Azure Web App name in repository or organization variables."
+            exit 1
+          fi
+
+          if [ -z "$AZURE_WEBAPP_PUBLISH_PROFILE" ]; then
+            echo "::error::Missing GitHub secret AZURE_WEBAPP_PUBLISH_PROFILE. Download the publish profile from Azure App Service and save it in repository or organization secrets."
+            exit 1
+          fi
+
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:

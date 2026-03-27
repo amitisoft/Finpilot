@@ -77,5 +77,8 @@ GitHub workflows:
 - `.github/workflows/validate-finpilot.yml`
 - `.github/workflows/deploy-azure-app-service.yml`
 
+Common deployment failure:
+- If GitHub Actions shows `No credentials found. Add an Azure login action before this action.`, the publish profile secret is missing or empty. Re-download the publish profile from Azure and save it as `AZURE_WEBAPP_PUBLISH_PROFILE`.
+
 Detailed checklist / architecture notes:
 - `docs/AZURE_DEPLOYMENT_PLAN.md`
