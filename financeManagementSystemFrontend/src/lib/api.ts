@@ -45,6 +45,12 @@ function normalizeProblemDetails(payload: unknown) {
   };
 }
 
+function extractFileName(contentDisposition: string | null) {
+  if (!contentDisposition) return null;
+  const match = /filename\*=UTF-8''([^;]+)|filename="?([^";]+)"?/i.exec(contentDisposition);
+  return decodeURIComponent(match?.[1] ?? match?.[2] ?? '').trim() || null;
+}
+
 export class ApiClient {
   constructor(private readonly getToken: () => string | null) {}
 
@@ -75,6 +81,30 @@ export class ApiClient {
     }
 
     return apiPayload.data;
+  }
+
+  async download(path: string): Promise<{ blob: Blob; fileName: string | null }> {
+    const response = await fetch(`${API_BASE_URL}${path}`, {
+      method: 'GET',
+      headers: {
+        ...(this.getToken() ? { Authorization: `Bearer ${this.getToken()}` } : {})
+      }
+    });
+
+    if (!response.ok) {
+      const payload = (await response.json().catch(() => null)) as ApiResponse<unknown> | Record<string, unknown> | null;
+      const apiPayload = payload as ApiResponse<unknown> | null;
+      const problem = normalizeProblemDetails(payload);
+      const message = apiPayload?.message ?? problem.message ?? response.statusText ?? 'Download failed';
+      const details = normalizeErrors(apiPayload?.errors);
+      const mergedDetails = details.length > 0 ? details : problem.details;
+      throw new Error(mergedDetails.length > 0 ? `${message} ${mergedDetails.join(' | ')}` : message);
+    }
+
+    return {
+      blob: await response.blob(),
+      fileName: extractFileName(response.headers.get('content-disposition'))
+    };
   }
 
   get<T>(path: string) {

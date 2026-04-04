@@ -1,0 +1,697 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+.coach-page {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+  height: 100%;
+  min-height: 0;
+
+  &__workspace {
+    @include card-surface($color-surface, $color-border);
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    min-height: 0;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at top right, rgba(93, 86, 214, 0.08), transparent 28%),
+      linear-gradient(180deg, rgba(247, 249, 252, 0.95), #fff 42%);
+  }
+
+  &__topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-4;
+    padding: $space-5 $space-6;
+    border-bottom: 1px solid rgba(217, 226, 239, 0.8);
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(16px);
+  }
+
+  &__brand {
+    display: flex;
+    align-items: center;
+    gap: $space-4;
+  }
+
+  &__brand-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 1rem;
+    background: linear-gradient(135deg, #1b2450 0%, #4158cb 52%, #756de9 100%);
+    color: #fff;
+    box-shadow: 0 14px 30px rgba(32, 63, 174, 0.18);
+  }
+
+  &__brand-title {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+
+  &__brand-status {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    margin: $space-1 0 0;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: $color-success;
+  }
+
+  &__brand-status-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: $color-success;
+    box-shadow: 0 0 0 4px rgba(18, 128, 92, 0.12);
+  }
+
+  &__topbar-action {
+    @include button-reset;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px solid $color-border;
+    border-radius: $radius-control;
+    background: rgba(255, 255, 255, 0.86);
+    color: $color-text-muted;
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+
+    &:hover {
+      border-color: $color-border-strong;
+      color: $color-text;
+      background: $color-surface;
+    }
+  }
+
+  &__feedback {
+    margin: $space-5 $space-6 0;
+    padding: $space-4 $space-5;
+    border: 1px solid rgba(195, 62, 77, 0.18);
+    border-radius: $radius-card;
+    background: $color-danger-soft;
+    color: $color-danger;
+    font-size: 0.92rem;
+    font-weight: 600;
+  }
+
+  &__layout {
+    display: grid;
+    gap: $space-5;
+    min-height: 0;
+    padding: $space-5 $space-6 $space-6;
+
+    @media (min-width: 1180px) {
+      grid-template-columns: minmax(0, 1.65fr) minmax(310px, 0.85fr);
+      align-items: stretch;
+    }
+  }
+
+  &__chat-panel {
+    @include card-surface(rgba(255, 255, 255, 0.88), rgba(217, 226, 239, 0.9));
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    min-height: 0;
+    overflow: hidden;
+    backdrop-filter: blur(18px);
+  }
+
+  &__chat-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: $space-4;
+    padding: $space-6;
+    border-bottom: 1px solid rgba(217, 226, 239, 0.72);
+
+    @media (max-width: 900px) {
+      flex-direction: column;
+    }
+  }
+
+  &__chat-header-main {
+    min-width: 0;
+  }
+
+  &__section-eyebrow {
+    @include eyebrow;
+    margin: 0;
+  }
+
+  &__chat-title {
+    margin: $space-2 0 0;
+    font-size: clamp(1.8rem, 1.4rem + 1.2vw, 2.5rem);
+    line-height: 1.02;
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    color: $color-text;
+  }
+
+  &__chat-copy {
+    max-width: 52rem;
+    margin: $space-3 0 0;
+    color: $color-text-muted;
+    line-height: 1.72;
+  }
+
+  &__header-badges {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    flex-wrap: wrap;
+  }
+
+  &__prompt-strip {
+    display: flex;
+    gap: $space-3;
+    overflow-x: auto;
+    padding: $space-4 $space-6;
+    border-bottom: 1px solid rgba(217, 226, 239, 0.72);
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  &__prompt-chip {
+    @include button-reset;
+    flex: 0 0 auto;
+    padding: 0.82rem 1.15rem;
+    border: 1px solid rgba(202, 212, 228, 0.9);
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.94);
+    color: $color-text;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+
+    &:hover {
+      border-color: rgba(93, 86, 214, 0.32);
+      box-shadow: 0 10px 24px rgba(93, 86, 214, 0.08);
+      transform: translateY(-1px);
+    }
+  }
+
+  &__message-list {
+    min-height: 0;
+    overflow-y: auto;
+    padding: $space-6;
+    display: flex;
+    flex-direction: column;
+    gap: $space-5;
+    background:
+      radial-gradient(circle at top left, rgba(93, 86, 214, 0.045), transparent 30%),
+      rgba(247, 249, 252, 0.72);
+  }
+
+  &__message-row {
+    display: flex;
+
+    &--assistant {
+      justify-content: flex-start;
+    }
+
+    &--user {
+      justify-content: flex-end;
+    }
+  }
+
+  &__message-stack {
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+    max-width: min(42rem, 88%);
+
+    &--user {
+      align-items: flex-end;
+    }
+
+    &--assistant {
+      align-items: flex-start;
+    }
+  }
+
+  &__message-meta {
+    margin: 0;
+    padding: 0 $space-2;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: $color-text-soft;
+  }
+
+  &__message {
+    padding: $space-5;
+    border-radius: 1.65rem;
+    box-shadow: $shadow-card;
+
+    &--assistant {
+      border: 1px solid rgba(217, 226, 239, 0.92);
+      background: rgba(255, 255, 255, 0.94);
+      color: $color-text;
+      border-top-left-radius: 0.5rem;
+    }
+
+    &--user {
+      background: linear-gradient(135deg, #18233f 0%, #202f5d 48%, #101a31 100%);
+      color: #fff;
+      border-top-right-radius: 0.5rem;
+    }
+  }
+
+  &__agent-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-2;
+    margin-bottom: $space-3;
+    font-size: 0.66rem;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+
+    &--indigo {
+      color: $color-violet;
+    }
+
+    &--rose {
+      color: $color-danger;
+    }
+
+    &--emerald {
+      color: $color-success;
+    }
+
+    &--amber {
+      color: $color-warning;
+    }
+
+    &--violet {
+      color: $color-violet;
+    }
+  }
+
+  &__agent-badge-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.35rem;
+    height: 1.35rem;
+    border-radius: 0.5rem;
+    background: rgba(23, 32, 51, 0.06);
+  }
+
+  &__message-text {
+    margin: 0;
+    font-size: 0.98rem;
+    line-height: 1.78;
+  }
+
+  &__inline-action {
+    @include button-reset;
+    display: inline-flex;
+    align-items: center;
+    gap: $space-2;
+    margin-top: $space-3;
+    color: $color-accent;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  &__action-card {
+    margin-top: $space-4;
+    padding: $space-4;
+    border-radius: 1.2rem;
+    border: 1px solid transparent;
+
+    &--rose {
+      border-color: rgba(195, 62, 77, 0.18);
+      background: linear-gradient(180deg, rgba(255, 241, 243, 0.96), rgba(255, 255, 255, 0.9));
+    }
+
+    &--amber {
+      border-color: rgba(161, 93, 0, 0.18);
+      background: linear-gradient(180deg, rgba(255, 246, 229, 0.96), rgba(255, 255, 255, 0.9));
+    }
+
+    &--emerald {
+      border-color: rgba(18, 128, 92, 0.18);
+      background: linear-gradient(180deg, rgba(234, 248, 241, 0.96), rgba(255, 255, 255, 0.9));
+    }
+
+    &--violet {
+      border-color: rgba(93, 86, 214, 0.18);
+      background: linear-gradient(180deg, rgba(242, 239, 255, 0.96), rgba(255, 255, 255, 0.9));
+    }
+  }
+
+  &__action-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: $space-4;
+  }
+
+  &__action-card-eyebrow {
+    @include eyebrow;
+    margin: 0;
+    letter-spacing: 0.22em;
+  }
+
+  &__action-card-title {
+    margin: $space-2 0 0;
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+
+  &__action-card-copy {
+    margin: $space-4 0 0;
+    color: $color-text-muted;
+    line-height: 1.74;
+  }
+
+  &__action-card-actions {
+    display: flex;
+    gap: $space-3;
+    flex-wrap: wrap;
+    margin-top: $space-4;
+  }
+
+  &__action-button {
+    @include button-reset;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 10rem;
+    padding: 0.82rem 1rem;
+    border-radius: 0.95rem;
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+
+    &:hover {
+      transform: translateY(-1px);
+    }
+
+    &--primary {
+      background: $color-text;
+      color: #fff;
+      box-shadow: 0 12px 24px rgba(23, 32, 51, 0.14);
+    }
+
+    &--secondary {
+      border: 1px solid rgba(23, 32, 51, 0.08);
+      background: rgba(255, 255, 255, 0.82);
+      color: $color-text-muted;
+    }
+  }
+
+  &__typing {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-2;
+    padding: $space-4 $space-5;
+    border: 1px solid rgba(217, 226, 239, 0.92);
+    border-radius: 1.25rem;
+    background: rgba(255, 255, 255, 0.94);
+  }
+
+  &__typing-dot {
+    width: 0.48rem;
+    height: 0.48rem;
+    border-radius: 50%;
+    background: $color-text-soft;
+    animation: coach-page-bounce 1.2s infinite ease-in-out;
+
+    &:nth-child(2) {
+      animation-delay: 0.15s;
+    }
+
+    &:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+  }
+
+  &__composer-shell {
+    border-top: 1px solid rgba(217, 226, 239, 0.72);
+    background: rgba(255, 255, 255, 0.92);
+    padding: $space-5 $space-6;
+  }
+
+  &__composer-row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: $space-3;
+    padding: $space-3;
+    border: 1px solid rgba(217, 226, 239, 0.95);
+    border-radius: 1.25rem;
+    background: #fff;
+    box-shadow: 0 10px 26px rgba(15, 23, 42, 0.04);
+  }
+
+  &__composer-icon,
+  &__send-button {
+    @include button-reset;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.95rem;
+  }
+
+  &__composer-icon {
+    width: 2.75rem;
+    height: 2.75rem;
+    color: $color-text-soft;
+    background: rgba(247, 249, 252, 0.9);
+    cursor: pointer;
+  }
+
+  &__composer-input {
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    color: $color-text;
+    font: inherit;
+    font-size: 0.98rem;
+
+    &::placeholder {
+      color: $color-text-soft;
+    }
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  &__send-button {
+    width: 2.95rem;
+    height: 2.95rem;
+    background: #cfd5e4;
+    color: #fff;
+    transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+
+    &--ready {
+      background: linear-gradient(135deg, #203fae 0%, #5668dd 52%, #756de9 100%);
+      box-shadow: 0 16px 26px rgba(32, 63, 174, 0.18);
+      cursor: pointer;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+
+    &:not(:disabled):hover {
+      transform: translateY(-1px);
+    }
+  }
+
+  &__disclaimer {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    margin-top: $space-3;
+    color: $color-text-soft;
+    font-size: 0.74rem;
+  }
+
+  &__side-column {
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+    min-height: 0;
+  }
+
+  &__panel {
+    @include card-surface(rgba(255, 255, 255, 0.88), rgba(217, 226, 239, 0.9));
+    padding: $space-5;
+    backdrop-filter: blur(16px);
+
+    &--capabilities {
+      flex: 1;
+      min-height: 0;
+    }
+  }
+
+  &__panel-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: $space-3;
+  }
+
+  &__panel-title {
+    margin: $space-2 0 0;
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+
+  &__suggestion-list,
+  &__capability-list {
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+    margin-top: $space-4;
+  }
+
+  &__suggestion-card {
+    @include button-reset;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-3;
+    width: 100%;
+    padding: $space-4;
+    border: 1px solid rgba(217, 226, 239, 0.92);
+    border-radius: 1rem;
+    background: rgba(247, 249, 252, 0.78);
+    color: $color-text;
+    text-align: left;
+    font-weight: 600;
+    line-height: 1.55;
+    cursor: pointer;
+    transition: border-color 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
+
+    &:hover {
+      border-color: rgba(93, 86, 214, 0.28);
+      background: #fff;
+      transform: translateY(-1px);
+    }
+  }
+
+  &__capability-card {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: $space-3;
+    align-items: start;
+    padding: $space-4;
+    border-radius: 1rem;
+    border: 1px solid rgba(217, 226, 239, 0.92);
+    background: rgba(247, 249, 252, 0.78);
+
+    svg {
+      margin-top: 0.1rem;
+    }
+
+    h5 {
+      margin: 0;
+      font-size: 0.92rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    p {
+      margin: $space-2 0 0;
+      color: $color-text-muted;
+      line-height: 1.65;
+    }
+
+    &--indigo {
+      color: $color-violet;
+    }
+
+    &--rose {
+      color: $color-danger;
+    }
+
+    &--amber {
+      color: $color-warning;
+    }
+
+    &--emerald {
+      color: $color-success;
+    }
+  }
+
+  @media (max-width: 1179px) {
+    &__layout {
+      grid-template-columns: 1fr;
+    }
+
+    &__side-column {
+      order: -1;
+    }
+  }
+
+  @media (max-width: 767px) {
+    &__topbar,
+    &__layout,
+    &__chat-header,
+    &__message-list,
+    &__composer-shell,
+    &__prompt-strip {
+      padding-left: $space-4;
+      padding-right: $space-4;
+    }
+
+    &__message-stack {
+      max-width: 100%;
+    }
+
+    &__message {
+      width: 100%;
+    }
+
+    &__composer-row {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+    }
+  }
+}
+
+@keyframes coach-page-bounce {
+  0%,
+  80%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.55;
+  }
+
+  40% {
+    transform: translateY(-3px);
+    opacity: 1;
+  }
+}

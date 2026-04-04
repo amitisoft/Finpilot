@@ -1,0 +1,232 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+.app-card {
+  @include card-surface;
+  padding: $space-6;
+
+  &--dashed {
+    border-style: dashed;
+  }
+
+  &--centered {
+    text-align: center;
+  }
+}
+
+.app-section-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: $space-4;
+  margin-bottom: $space-5;
+
+  &__eyebrow {
+    @include eyebrow;
+    margin: 0;
+  }
+
+  &__title {
+    margin: $space-2 0 0;
+    font-size: 1.9rem;
+    line-height: 1.1;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+  }
+}
+
+.app-metric-card {
+  min-height: 152px;
+
+  &__label {
+    @include eyebrow;
+    margin: 0;
+  }
+
+  &__value {
+    margin: $space-6 0 0;
+    font-size: 2.55rem;
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: -0.05em;
+
+    &--default {
+      color: $color-text;
+    }
+
+    &--positive {
+      color: $color-success;
+    }
+
+    &--negative {
+      color: $color-danger;
+    }
+  }
+}
+
+.app-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 0.35rem 0.8rem;
+  border: 1px solid $color-border;
+  border-radius: $radius-pill;
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  white-space: nowrap;
+
+  &--slate {
+    background: $color-surface-alt;
+    color: $color-text-muted;
+  }
+
+  &--emerald {
+    background: $color-success-soft;
+    border-color: rgba(18, 128, 92, 0.18);
+    color: $color-success;
+  }
+
+  &--rose {
+    background: $color-danger-soft;
+    border-color: rgba(195, 62, 77, 0.18);
+    color: $color-danger;
+  }
+
+  &--amber {
+    background: $color-warning-soft;
+    border-color: rgba(161, 93, 0, 0.18);
+    color: $color-warning;
+  }
+
+  &--violet {
+    background: $color-violet-soft;
+    border-color: rgba(93, 86, 214, 0.18);
+    color: $color-violet;
+  }
+}
+
+.app-empty-state {
+  text-align: center;
+
+  &__eyebrow {
+    @include eyebrow;
+    margin: 0;
+  }
+
+  &__title {
+    margin: $space-3 0 0;
+    font-size: 1.45rem;
+    font-weight: 800;
+  }
+
+  &__copy {
+    max-width: 640px;
+    margin: $space-2 auto 0;
+    color: $color-text-muted;
+    font-size: 0.95rem;
+    line-height: 1.7;
+  }
+}
+
+.app-loading-panel {
+  text-align: center;
+  color: $color-text-muted;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+
+.app-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $space-5;
+
+  &__backdrop {
+    position: absolute;
+    inset: 0;
+    border: 0;
+    background: rgba(15, 23, 42, 0.38);
+    cursor: pointer;
+  }
+
+  &__surface {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    width: min(1120px, 100%);
+    max-height: min(88vh, 960px);
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid $color-border;
+    border-radius: $radius-shell;
+    background: $color-surface;
+    box-shadow: 0 30px 80px rgba(15, 23, 42, 0.18);
+  }
+
+  &__header {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: $space-4;
+    padding: $space-5;
+    border-bottom: 1px solid $color-border;
+    background: $color-surface-alt;
+  }
+
+  &__eyebrow {
+    @include eyebrow;
+    margin: 0;
+  }
+
+  &__title {
+    margin: $space-2 0 0;
+    font-size: 1.65rem;
+    line-height: 1.1;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+  }
+
+  &__description {
+    max-width: 720px;
+    margin: $space-2 0 0;
+    color: $color-text-muted;
+    line-height: 1.7;
+  }
+
+  &__close {
+    @include button-reset;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    border: 1px solid $color-border;
+    border-radius: $radius-control;
+    background: $color-surface;
+    color: $color-text-muted;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+
+    &:hover {
+      border-color: $color-border-strong;
+      background: $color-surface-raised;
+      color: $color-text;
+    }
+  }
+
+  &__body {
+    flex: 1;
+    overflow: auto;
+    padding: $space-5;
+  }
+}

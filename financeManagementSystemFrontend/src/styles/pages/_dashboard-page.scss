@@ -1,0 +1,363 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+.dashboard-page {
+  display: grid;
+  gap: $space-6;
+
+  &__hero {
+    display: grid;
+    gap: $space-6;
+  }
+
+  &__hero-row {
+    display: flex;
+    flex-direction: column;
+    gap: $space-5;
+
+    @media (min-width: 1080px) {
+      flex-direction: row;
+      align-items: start;
+      justify-content: space-between;
+    }
+  }
+
+  &__hero-copy {
+    max-width: 760px;
+  }
+
+  &__hero-eyebrow,
+  &__mini-eyebrow,
+  &__feature-eyebrow,
+  &__progress-label {
+    @include eyebrow;
+    margin: 0;
+  }
+
+  &__hero-balance {
+    margin: $space-4 0 0;
+    font-size: clamp(2.8rem, 5vw, 4.2rem);
+    line-height: 0.95;
+    font-weight: 800;
+    letter-spacing: -0.055em;
+  }
+
+  &__hero-copy-text {
+    margin: $space-4 0 0;
+    color: $color-text-muted;
+    line-height: 1.75;
+  }
+
+  &__hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-3;
+  }
+
+  &__action,
+  &__action-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-2;
+    padding: 0.9rem 1rem;
+    border-radius: $radius-control;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+
+    &:hover {
+      transform: translateY(-1px);
+    }
+  }
+
+  &__action {
+    background: $color-text;
+    color: #fff;
+  }
+
+  &__action-secondary {
+    border: 1px solid $color-border;
+    background: $color-surface;
+    color: $color-text-muted;
+  }
+
+  &__metrics {
+    display: grid;
+    gap: $space-3;
+
+    @media (min-width: 780px) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @media (min-width: 1400px) {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+  }
+
+  &__metric {
+    padding: $space-5;
+    border: 1px solid $color-border;
+    border-radius: $radius-card;
+    background: $color-surface-alt;
+
+    &--income {
+      border-color: rgba(18, 128, 92, 0.18);
+      background: $color-success-soft;
+      color: $color-success;
+    }
+
+    &--expense {
+      border-color: rgba(195, 62, 77, 0.18);
+      background: $color-danger-soft;
+      color: $color-danger;
+    }
+
+    &--projection {
+      border-color: rgba(93, 86, 214, 0.18);
+      background: $color-violet-soft;
+      color: $color-violet;
+    }
+  }
+
+  &__metric-header {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+  }
+
+  &__metric-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  &__metric-label {
+    @include eyebrow;
+    margin: 0;
+  }
+
+  &__metric-value {
+    margin: $space-4 0 0;
+    font-size: 2.1rem;
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    color: inherit;
+
+    &--default {
+      color: $color-text;
+    }
+  }
+
+  &__metric-note {
+    margin: $space-2 0 0;
+    color: inherit;
+    opacity: 0.78;
+    font-size: 0.9rem;
+  }
+
+  &__feature-grid,
+  &__utility-grid {
+    display: grid;
+    gap: $space-4;
+
+    @media (min-width: 780px) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @media (min-width: 1320px) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  &__utility-grid {
+    @media (min-width: 780px) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  &__feature-card,
+  &__utility-card,
+  &__setup-link,
+  &__brief-highlight {
+    border: 1px solid $color-border;
+    border-radius: $radius-card;
+    background: $color-surface-alt;
+    transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+
+    &:hover {
+      border-color: $color-border-strong;
+      background: $color-surface;
+      transform: translateY(-1px);
+    }
+  }
+
+  &__feature-card {
+    display: block;
+    padding: $space-5;
+  }
+
+  &__feature-card-header,
+  &__utility-card-header {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: $space-3;
+  }
+
+  &__feature-card-icon,
+  &__utility-card-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: $color-surface;
+    box-shadow: $shadow-card;
+    color: $color-text;
+  }
+
+  &__feature-card-arrow {
+    width: 16px;
+    height: 16px;
+    color: $color-text-soft;
+    transition: transform 0.2s ease, color 0.2s ease;
+  }
+
+  &__feature-card:hover &__feature-card-arrow {
+    transform: translateX(2px);
+    color: $color-text;
+  }
+
+  &__feature-card-title,
+  &__utility-card-title {
+    margin: $space-4 0 0;
+    font-size: 1.25rem;
+    line-height: 1.15;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+  }
+
+  &__feature-card-top,
+  &__utility-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-3;
+    margin-top: $space-4;
+  }
+
+  &__feature-card-copy,
+  &__utility-card-copy,
+  &__coach-copy,
+  &__brief-copy {
+    margin: $space-3 0 0;
+    color: $color-text-muted;
+    font-size: 0.95rem;
+    line-height: 1.75;
+  }
+
+  &__triptych {
+    display: grid;
+    gap: $space-6;
+
+    @media (min-width: 1280px) {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+  }
+
+  &__triptych-card {
+    @media (min-width: 1280px) {
+      grid-column: span 4;
+    }
+  }
+
+  &__progress-bar {
+    width: 100%;
+    height: 8px;
+    overflow: hidden;
+    border-radius: $radius-pill;
+    background: $color-border;
+  }
+
+  &__progress-fill {
+    height: 100%;
+    border-radius: $radius-pill;
+    background: linear-gradient(90deg, #172033 0%, #4f63da 100%);
+  }
+
+  &__setup-list,
+  &__brief-highlights {
+    display: grid;
+    gap: $space-3;
+    margin-top: $space-4;
+  }
+
+  &__setup-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-3;
+    padding: 0.95rem 1rem;
+    font-size: 0.95rem;
+    color: $color-text-muted;
+  }
+
+  &__setup-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+
+    &--complete {
+      background: #2fb171;
+    }
+
+    &--pending {
+      background: #f0ab3d;
+    }
+  }
+
+  &__coach-action {
+    margin-top: $space-4;
+    padding: $space-4;
+    border: 1px solid $color-border;
+    border-radius: $radius-card;
+    background: $color-surface-alt;
+  }
+
+  &__coach-action-title {
+    @include eyebrow;
+    margin: 0;
+  }
+
+  &__coach-action-copy {
+    margin: $space-2 0 0;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.6;
+  }
+
+  &__inline-link {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-2;
+    margin-top: $space-4;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: $color-text-muted;
+
+    &:hover {
+      color: $color-text;
+    }
+  }
+
+  &__utility-card {
+    display: flex;
+    gap: $space-4;
+    padding: $space-5;
+  }
+
+  &__empty-state {
+    color: $color-text-muted;
+  }
+}

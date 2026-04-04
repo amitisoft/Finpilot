@@ -1,0 +1,323 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+.app-shell {
+  height: 100vh;
+  overflow: hidden;
+  padding: $space-3;
+  color: $color-text;
+
+  @media (min-width: 768px) {
+    padding: $space-4;
+  }
+
+  &__frame {
+    display: flex;
+    gap: $space-4;
+    height: 100%;
+    min-height: 0;
+    width: 100%;
+  }
+
+  &__sidebar {
+    position: relative;
+    z-index: 6;
+    display: none;
+    width: 96px;
+    height: 100%;
+    flex-shrink: 0;
+
+    @media (min-width: 1024px) {
+      display: block;
+    }
+  }
+
+  &__rail {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    align-items: center;
+    gap: $space-4;
+    padding: $space-4 $space-3;
+    border: 1px solid $color-border;
+    border-radius: $radius-shell;
+    background: $color-surface;
+    box-shadow: $shadow-soft;
+    overflow: visible;
+  }
+
+  &__brand-button,
+  &__nav-link,
+  &__profile-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    background: transparent;
+  }
+
+  &__brand-button {
+    width: 56px;
+    height: 56px;
+    padding: 0;
+    border-radius: $radius-control;
+    background: linear-gradient(145deg, #1a44d4 0%, #3564ff 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24);
+    cursor: pointer;
+  }
+
+  &__logo-mark {
+    width: 34px;
+    height: 34px;
+  }
+
+  &__logo-bg {
+    fill: rgba(255, 255, 255, 0.16);
+  }
+
+  &__logo-line {
+    fill: none;
+    stroke: #ffffff;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  &__logo-dot {
+    fill: #ffffff;
+  }
+
+  &__nav {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    overflow: visible;
+    padding-right: 0;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  &__nav-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $space-2;
+  }
+
+  &__nav-link,
+  &__profile-button {
+    width: 56px;
+    height: 56px;
+    border-radius: $radius-control;
+    color: $color-text-muted;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+
+    &:hover {
+      background: $color-surface-alt;
+      color: $color-text;
+      transform: translateY(-1px);
+    }
+  }
+
+  &__nav-link {
+    border: 1px solid transparent;
+
+    &--active {
+      border-color: rgba(45, 91, 255, 0.18);
+      background: $color-accent-soft;
+      color: $color-accent;
+    }
+  }
+
+  &__nav-icon,
+  &__menu-icon,
+  &__menu-chevron {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+
+  &__tooltip {
+    pointer-events: none;
+    position: absolute;
+    left: calc(100% + 14px);
+    top: 50%;
+    z-index: 40;
+    min-width: max-content;
+    transform: translateY(-50%) translateX(-6px);
+    opacity: 0;
+    padding: $space-2 $space-3;
+    border: 1px solid $color-border;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: $shadow-card;
+    color: $color-text;
+    font-size: 0.86rem;
+    font-weight: 600;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    white-space: nowrap;
+  }
+
+  &__brand-button:hover &__tooltip,
+  &__brand-button:focus-visible &__tooltip,
+  &__nav-link:hover &__tooltip,
+  &__nav-link:focus-visible &__tooltip,
+  &__profile-button:hover &__tooltip,
+  &__profile-button:focus-visible &__tooltip {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+  }
+
+  &__tooltip--profile {
+    text-align: left;
+  }
+
+  &__profile {
+    position: relative;
+    margin-top: auto;
+  }
+
+  &__profile-button {
+    padding: 0;
+    border: 1px solid $color-border;
+    background: $color-surface-alt;
+  }
+
+  &__profile--open &__profile-button {
+    border-color: rgba(45, 91, 255, 0.22);
+    background: $color-accent-soft;
+    color: $color-accent;
+  }
+
+  &__avatar,
+  &__profile-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    background: linear-gradient(145deg, #1a44d4 0%, #3564ff 100%);
+    color: #fff;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  &__avatar {
+    width: 100%;
+    height: 100%;
+  }
+
+  &__profile-menu {
+    position: absolute;
+    left: calc(100% + 18px);
+    bottom: 0;
+    z-index: 20;
+    width: 260px;
+    padding: $space-4;
+    border: 1px solid $color-border;
+    border-radius: $radius-panel;
+    background: $color-surface;
+    box-shadow: $shadow-soft;
+    overflow: visible;
+  }
+
+  &__profile-summary {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    margin-bottom: $space-4;
+  }
+
+  &__profile-avatar {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+  }
+
+  &__profile-name {
+    margin: 0;
+    font-size: 0.98rem;
+    font-weight: 700;
+  }
+
+  &__profile-email {
+    margin: $space-1 0 0;
+    color: $color-text-muted;
+    font-size: 0.84rem;
+    word-break: break-word;
+  }
+
+  &__main {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    flex-direction: column;
+    overflow: hidden;
+    padding: $space-4;
+    border: 1px solid $color-border;
+    border-radius: $radius-shell;
+    background: $color-surface;
+    box-shadow: $shadow-soft;
+
+    @media (min-width: 768px) {
+      padding: $space-5;
+    }
+
+    @media (min-width: 1440px) {
+      padding: $space-6;
+    }
+  }
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+    padding: $space-5;
+    border: 1px solid $color-border;
+    border-radius: $radius-panel;
+    background: $color-surface-alt;
+
+    @media (min-width: 768px) {
+      flex-direction: row;
+      align-items: stretch;
+      justify-content: space-between;
+    }
+  }
+
+  &__status {
+    align-self: flex-end;
+    margin-left: auto;
+    min-width: 136px;
+    padding: $space-3 $space-4;
+    border: 1px solid rgba(18, 128, 92, 0.16);
+    border-radius: $radius-control;
+    background: $color-success-soft;
+    color: $color-success;
+    text-align: left;
+  }
+
+  &__status-eyebrow {
+    @include eyebrow;
+    color: $color-success;
+  }
+
+  &__status-label {
+    margin: $space-1 0 0;
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  &__content {
+    flex: 1;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-top: $space-5;
+    padding-bottom: $space-5;
+  }
+}

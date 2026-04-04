@@ -1,4 +1,5 @@
 using System.Net;
+using System.Security.Authentication;
 using System.Text.Json;
 using FinPilot.Application.Common;
 
@@ -11,6 +12,11 @@ public sealed class GlobalExceptionMiddleware(RequestDelegate next, ILogger<Glob
         try
         {
             await next(context);
+        }
+        catch (AuthenticationException exception)
+        {
+            logger.LogWarning(exception, "Authentication error for request {Path}", context.Request.Path);
+            await WriteErrorAsync(context, HttpStatusCode.Unauthorized, exception.Message);
         }
         catch (InvalidOperationException exception)
         {

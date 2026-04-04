@@ -1,0 +1,204 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+.auth-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: $space-6 $space-4;
+
+  &__layout {
+    display: grid;
+    width: min(1180px, 100%);
+    gap: $space-6;
+
+    @media (min-width: 1080px) {
+      grid-template-columns: minmax(0, 1.05fr) minmax(420px, 0.95fr);
+    }
+  }
+
+  &__panel,
+  &__sidebar {
+    @include card-surface;
+    padding: $space-8;
+  }
+
+  &__sidebar-inner {
+    @include card-surface($color-surface-alt, $color-border);
+    padding: $space-8;
+    background: linear-gradient(180deg, #fbfcff 0%, #f6f8fc 100%);
+  }
+
+  &__eyebrow,
+  &__field-label,
+  &__feature-label {
+    @include eyebrow;
+    margin: 0;
+  }
+
+  &__headline {
+    margin: $space-4 0 0;
+    font-size: clamp(2.75rem, 4vw, 4.5rem);
+    line-height: 0.98;
+    font-weight: 800;
+    letter-spacing: -0.055em;
+  }
+
+  &__copy {
+    max-width: 640px;
+    margin: $space-4 0 0;
+    color: $color-text-muted;
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+
+  &__feature-grid {
+    display: grid;
+    gap: $space-4;
+    margin-top: $space-7;
+
+    @media (min-width: 760px) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  &__feature {
+    padding: $space-6;
+    border-radius: $radius-card;
+    border: 1px solid $color-border;
+    background: $color-surface;
+    box-shadow: $shadow-card;
+
+    &--primary {
+      background: linear-gradient(150deg, #203fae 0%, #4762d5 100%);
+      border-color: transparent;
+      color: #fff;
+    }
+  }
+
+  &__feature-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  &__feature-title {
+    margin: $space-6 0 0;
+    font-size: 1.65rem;
+    line-height: 1.18;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+  }
+
+  &__feature-copy {
+    margin: $space-3 0 0;
+    color: inherit;
+    opacity: 0.84;
+    line-height: 1.7;
+  }
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+    margin-bottom: $space-7;
+
+    @media (min-width: 640px) {
+      flex-direction: row;
+      align-items: start;
+      justify-content: space-between;
+    }
+  }
+
+  &__title {
+    margin: $space-2 0 0;
+    font-size: 2.5rem;
+    line-height: 1.05;
+    font-weight: 800;
+    letter-spacing: -0.045em;
+  }
+
+  &__toggle {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: $space-1;
+    padding: $space-1;
+    border: 1px solid $color-border;
+    border-radius: $radius-pill;
+    background: $color-surface;
+    white-space: nowrap;
+  }
+
+  &__toggle-button {
+    @include button-reset;
+    min-width: 104px;
+    padding: 0.8rem 1rem;
+    border-radius: $radius-pill;
+    color: $color-text-muted;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+
+    &--active {
+      background: $color-text;
+      color: #fff;
+    }
+  }
+
+  &__form {
+    display: grid;
+    gap: $space-4;
+  }
+
+  &__field {
+    display: grid;
+    gap: $space-2;
+  }
+
+  &__message {
+    padding: 0.95rem 1rem;
+    border: 1px solid $color-border;
+    border-radius: $radius-control;
+    font-size: 0.95rem;
+    line-height: 1.6;
+
+    &--success {
+      background: $color-success-soft;
+      border-color: rgba(18, 128, 92, 0.2);
+      color: $color-success;
+    }
+
+    &--error {
+      background: $color-danger-soft;
+      border-color: rgba(195, 62, 77, 0.2);
+      color: $color-danger;
+    }
+  }
+
+  &__submit {
+    @include button-reset;
+    width: 100%;
+    padding: 1rem 1.25rem;
+    border-radius: $radius-control;
+    background: linear-gradient(135deg, #1f3fb6 0%, #4d6be0 55%, #6478ea 100%);
+    color: #fff;
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    box-shadow: 0 16px 30px rgba(32, 63, 182, 0.2);
+
+    &:hover:not(:disabled) {
+      transform: translateY(-1px);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.62;
+    }
+  }
+}

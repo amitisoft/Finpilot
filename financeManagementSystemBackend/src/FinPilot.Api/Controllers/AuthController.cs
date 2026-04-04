@@ -13,11 +13,11 @@ public sealed class AuthController(IAuthService authService, ICurrentUserService
     [AllowAnonymous]
     [EnableRateLimiting("auth")]
     [HttpPost("register")]
-    [ProducesResponseType(typeof(ApiResponse<AuthResponse>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<ApiResponse<AuthResponse>>> Register(RegisterRequest request, CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(ApiResponse<RegistrationResponse>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<ApiResponse<RegistrationResponse>>> Register(RegisterRequest request, CancellationToken cancellationToken)
     {
         var response = await authService.RegisterAsync(request, HttpContext.Connection.RemoteIpAddress?.ToString(), cancellationToken);
-        return Success(response, "User registered successfully");
+        return Success(response, "User registered successfully. Please sign in to continue.");
     }
 
     [AllowAnonymous]

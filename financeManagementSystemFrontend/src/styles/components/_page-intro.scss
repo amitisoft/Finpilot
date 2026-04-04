@@ -1,0 +1,55 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+.app-page-intro {
+  display: flex;
+  flex-direction: column;
+  gap: $space-5;
+
+  @media (min-width: 900px) {
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: space-between;
+  }
+
+  &__body {
+    max-width: 760px;
+  }
+
+  &__eyebrow {
+    @include eyebrow;
+    margin: 0;
+  }
+
+  &__title {
+    margin: $space-2 0 0;
+    font-size: clamp(2rem, 3vw, 2.8rem);
+    line-height: 1.05;
+    font-weight: 800;
+    letter-spacing: -0.045em;
+    color: $color-text;
+  }
+
+  &__description {
+    margin: $space-3 0 0;
+    color: $color-text-muted;
+    line-height: 1.75;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-3;
+    margin-top: $space-4;
+  }
+
+  &__aside {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: flex-end;
+    align-self: stretch;
+    margin-left: auto;
+    gap: $space-2;
+  }
+}

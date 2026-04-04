@@ -1,179 +1,419 @@
-import { useEffect, useRef, useState } from 'react';
-import { Bot, CornerDownRight, Send, Sparkles } from 'lucide-react';
-import { Badge, GlassCard } from '../components/Ui';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import type { LucideIcon } from 'lucide-react';
+import {
+  ArrowUpRight,
+  ChevronRight,
+  Info,
+  MoreVertical,
+  Paperclip,
+  PieChart,
+  Send,
+  ShieldAlert,
+  Sparkles,
+  TrendingUp,
+  Zap,
+  FileText
+} from 'lucide-react';
+import { Badge } from '../components/Ui';
 import { useAuth } from '../contexts/AuthContext';
 import { agentTypeLabels, flattenErrors } from '../lib/utils';
 import type { AgentChatResponse } from '../types/api';
 
 const promptChips = [
-  'How can I improve my food spending?',
+  'How can I reduce food spending?',
   'Am I over budget this month?',
-  'Does this transaction look suspicious?',
   'How should I invest my monthly surplus?',
-  'Give me my monthly report summary'
+  'Give me my monthly report summary.'
 ];
 
+type ChatTone = 'indigo' | 'rose' | 'emerald' | 'amber' | 'violet';
+type ActionCardType = 'anomaly' | 'investment' | 'budget' | 'report';
+
+interface ActionCardData {
+  type: ActionCardType;
+  title: string;
+  subtitle: string;
+  body: string;
+  primaryAction: string;
+  secondaryAction?: string;
+  tone: ChatTone;
+}
+
 interface ChatMessage {
+  id: string;
   role: 'assistant' | 'user';
   content: string;
-  meta?: string;
+  timestamp: string;
+  agentLabel?: string;
+  agentIcon?: LucideIcon;
+  tone?: ChatTone;
+  actionCard?: ActionCardData;
+}
+
+function formatTime(value = new Date()) {
+  return value.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function shorten(text: string, max = 200) {
+  return text.length > max ? `${text.slice(0, max - 1)}…` : text;
+}
+
+function buildActionCard(agentUsed: number, prompt: string, reply: string): ActionCardData | undefined {
+  const summary = shorten(reply, 200);
+
+  if (agentUsed === 1) {
+    return {
+      type: 'anomaly',
+      title: 'Suspicious transaction review',
+      subtitle: 'Anomaly engine',
+      body: summary,
+      primaryAction: 'Flag for review',
+      secondaryAction: 'Looks safe',
+      tone: 'rose'
+    };
+  }
+
+  if (agentUsed === 2) {
+    return {
+      type: 'budget',
+      title: 'Budget adjustment idea',
+      subtitle: 'Budget advisor',
+      body: summary,
+      primaryAction: 'Open budgets',
+      secondaryAction: 'Keep monitoring',
+      tone: 'amber'
+    };
+  }
+
+  if (agentUsed === 4 || /invest|surplus/i.test(prompt)) {
+    return {
+      type: 'investment',
+      title: 'Surplus allocation suggestion',
+      subtitle: 'Investment advisor',
+      body: summary,
+      primaryAction: 'Open goals',
+      secondaryAction: 'Ask for another option',
+      tone: 'emerald'
+    };
+  }
+
+  if (agentUsed === 5 || /report/i.test(prompt)) {
+    return {
+      type: 'report',
+      title: 'Monthly report ready',
+      subtitle: 'Report generator',
+      body: summary,
+      primaryAction: 'Open reports',
+      secondaryAction: 'Summarize again',
+      tone: 'violet'
+    };
+  }
+
+  return undefined;
+}
+
+function agentPresentation(agentUsed: number) {
+  switch (agentUsed) {
+    case 1:
+      return { label: 'Anomaly Engine', icon: ShieldAlert as LucideIcon, tone: 'rose' as const };
+    case 2:
+      return { label: 'Budget Advisor', icon: PieChart as LucideIcon, tone: 'amber' as const };
+    case 4:
+      return { label: 'Investment Advisor', icon: TrendingUp as LucideIcon, tone: 'emerald' as const };
+    case 5:
+      return { label: 'Report Generator', icon: FileText as LucideIcon, tone: 'violet' as const };
+    default:
+      return { label: 'FinPilot Core', icon: Sparkles as LucideIcon, tone: 'indigo' as const };
+  }
+}
+
+function AgentBadge({ label, icon: Icon, tone = 'indigo' }: { label: string; icon?: LucideIcon; tone?: ChatTone }) {
+  return (
+    <div className={`coach-page__agent-badge coach-page__agent-badge--${tone}`}>
+      <span className="coach-page__agent-badge-icon">{Icon ? <Icon size={12} strokeWidth={2.6} /> : <Sparkles size={12} strokeWidth={2.6} />}</span>
+      <span>{label}</span>
+    </div>
+  );
+}
+
+function ActionCard({ data }: { data: ActionCardData }) {
+  return (
+    <section className={`coach-page__action-card coach-page__action-card--${data.tone}`}>
+      <div className="coach-page__action-card-header">
+        <div>
+          <p className="coach-page__action-card-eyebrow">{data.subtitle}</p>
+          <h4 className="coach-page__action-card-title">{data.title}</h4>
+        </div>
+        <Badge tone={data.tone === 'violet' ? 'violet' : data.tone === 'indigo' ? 'slate' : data.tone}>{data.type}</Badge>
+      </div>
+      <p className="coach-page__action-card-copy">{data.body}</p>
+      <div className="coach-page__action-card-actions">
+        <button type="button" className="coach-page__action-button coach-page__action-button--primary">{data.primaryAction}</button>
+        {data.secondaryAction ? (
+          <button type="button" className="coach-page__action-button coach-page__action-button--secondary">{data.secondaryAction}</button>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
+function ChatBubble({ message }: { message: ChatMessage }) {
+  const isUser = message.role === 'user';
+
+  return (
+    <div className={`coach-page__message-row coach-page__message-row--${message.role}`}>
+      <div className={`coach-page__message-stack coach-page__message-stack--${message.role}`}>
+        <p className="coach-page__message-meta">{isUser ? 'You' : message.agentLabel ?? 'Assistant'} • {message.timestamp}</p>
+        <article className={`coach-page__message coach-page__message--${message.role}`}>
+          {!isUser ? <AgentBadge label={message.agentLabel ?? 'FinPilot Core'} icon={message.agentIcon} tone={message.tone} /> : null}
+          <p className="coach-page__message-text">{message.content}</p>
+          {!isUser && message.actionCard ? <ActionCard data={message.actionCard} /> : null}
+          {!isUser && !message.actionCard ? (
+            <button type="button" className="coach-page__inline-action">
+              Tell me more <ChevronRight size={12} />
+            </button>
+          ) : null}
+        </article>
+      </div>
+    </div>
+  );
 }
 
 export function CoachPage() {
-  const { api } = useAuth();
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: 'assistant', content: 'Welcome to FinPilot Advisor. Ask about spending, budgets, anomalies, reports, or monthly surplus planning.', meta: 'Advisor' }
-  ]);
+  const { api, user } = useAuth();
+  const [messages, setMessages] = useState<ChatMessage[]>(() => {
+    const firstName = user?.fullName?.split(' ')[0] ?? 'there';
+    return [
+      {
+        id: 'welcome',
+        role: 'assistant',
+        agentLabel: 'FinPilot Core',
+        agentIcon: Sparkles,
+        tone: 'indigo',
+        content: `Financial command initialized. Hi ${firstName}. I have your balances, recent spending, and current goals in view. Ask for clearer spending direction, budget pressure checks, anomaly review, or monthly planning.`,
+        timestamp: formatTime()
+      }
+    ];
+  });
   const [suggestions, setSuggestions] = useState<string[]>(promptChips);
-  const [message, setMessage] = useState('');
-  const [riskProfile] = useState('moderate');
-  const [age] = useState(29);
-  const [sending, setSending] = useState(false);
+  const [inputValue, setInputValue] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const messageListRef = useRef<HTMLDivElement | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const riskProfile = 'moderate';
+  const age = 29;
 
   useEffect(() => {
-    const list = messageListRef.current;
-    if (!list) return;
-    list.scrollTo({ top: list.scrollHeight, behavior: 'smooth' });
-  }, [messages]);
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, isTyping]);
 
-  const sendChat = async (text: string) => {
-    if (!text.trim()) return;
+  const userTurns = useMemo(() => messages.filter((message) => message.role === 'user'), [messages]);
+  const firstName = user?.fullName?.split(' ')[0] ?? 'there';
+  const headerTitle = useMemo(() => `${firstName}, your AI financial desk is ready.`, [firstName]);
 
-    setSending(true);
+  const handleSend = async (text: string) => {
+    const trimmed = text.trim();
+    if (!trimmed) return;
+
+    const userMessage: ChatMessage = {
+      id: `${Date.now()}-user`,
+      role: 'user',
+      content: trimmed,
+      timestamp: formatTime()
+    };
+
+    const priorUserTurns = userTurns.slice(-4).map((item) => item.content);
+
+    setMessages((current) => [...current, userMessage]);
+    setInputValue('');
+    setIsTyping(true);
     setError(null);
-
-    const nextHistory = [...messages.filter((item) => item.role === 'user').slice(-4).map((item) => item.content), text];
-    setMessages((current) => [...current, { role: 'user', content: text }]);
 
     try {
       const response = await api.post<AgentChatResponse>('/api/agents/chat', {
-        message: text,
+        message: trimmed,
         riskProfile,
         age,
-        conversationHistory: nextHistory
+        conversationHistory: [...priorUserTurns, trimmed]
       });
 
-      setMessages((current) => [...current, { role: 'assistant', content: response.reply, meta: agentTypeLabels[response.agentUsed] }]);
-      setSuggestions(response.followUpSuggestions.length > 0 ? Array.from(response.followUpSuggestions) : promptChips);
-      setMessage('');
+      const presentation = agentPresentation(response.agentUsed);
+      const assistantMessage: ChatMessage = {
+        id: `${Date.now()}-assistant`,
+        role: 'assistant',
+        content: response.reply,
+        timestamp: formatTime(new Date(response.generatedAt)),
+        agentLabel: presentation.label || agentTypeLabels[response.agentUsed],
+        agentIcon: presentation.icon,
+        tone: presentation.tone,
+        actionCard: buildActionCard(response.agentUsed, trimmed, response.reply)
+      };
+
+      setMessages((current) => [...current, assistantMessage]);
+      setSuggestions(response.followUpSuggestions.length > 0 ? response.followUpSuggestions : promptChips);
     } catch (sendError) {
       setError(flattenErrors(sendError));
     } finally {
-      setSending(false);
-    }
-  };
-
-  const handleComposerKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault();
-      void sendChat(message);
+      setIsTyping(false);
     }
   };
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-4 overflow-hidden">
-      <div className="flex shrink-0 items-start justify-between gap-4">
-        <div>
-          <p className="text-xs font-black uppercase tracking-[0.35em] text-slate-400">AI Coach</p>
-          <h3 className="mt-2 text-3xl font-black tracking-tight text-slate-900">A focused finance chat workspace.</h3>
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500">Ask naturally. FinPilot resolves the right financial context behind the scenes so the workspace stays focused on conversation.</p>
-        </div>
-        <Badge tone="violet">Advisor online</Badge>
-      </div>
-
-      {error && <GlassCard className="shrink-0 border-rose-200 bg-rose-50 text-rose-700">{error}</GlassCard>}
-
-      <div className="grid min-h-0 flex-1 gap-4 xl:grid-cols-[minmax(0,1.8fr)_320px]">
-        <GlassCard className="min-h-0 min-w-0 overflow-hidden p-0">
-          <div className="flex h-full min-h-0 flex-col">
-            <div className="shrink-0 border-b border-slate-200 px-5 py-4">
-              <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                <div>
-                  <p className="text-xs font-black uppercase tracking-[0.35em] text-slate-400">Conversation</p>
-                  <h4 className="mt-2 text-2xl font-black text-slate-900">Financial coach and specialist routing</h4>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Badge tone="slate">{Math.max(messages.length - 1, 0)} messages</Badge>
-                  <Badge tone="emerald">Live coach</Badge>
-                </div>
-              </div>
-            </div>
-
-            <div ref={messageListRef} className="min-h-0 flex-1 space-y-4 overflow-y-auto bg-slate-50/80 px-4 py-5 md:px-5">
-              {messages.map((item, index) => (
-                <div key={`${item.role}-${index}`} className={`flex ${item.role === 'assistant' ? 'justify-start' : 'justify-end'}`}>
-                  <div className={`max-w-[82%] rounded-[1.5rem] px-4 py-3 shadow-sm ${item.role === 'assistant' ? 'border border-slate-200 bg-white text-slate-900' : 'bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 text-white'}`}>
-                    {item.role === 'assistant' && (
-                      <div className="mb-2 flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.3em] text-slate-400">
-                        <Bot className="h-3.5 w-3.5" />
-                        {item.meta ?? 'Advisor'}
-                      </div>
-                    )}
-                    <p className="text-sm leading-7">{item.content}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="shrink-0 border-t border-slate-200 bg-white p-4 md:p-5">
-              <div className="flex gap-3">
-                <input
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  onKeyDown={handleComposerKeyDown}
-                  placeholder="Ask your AI financial coach…"
-                  className="min-w-0 flex-1 rounded-[1.5rem] border border-slate-200 bg-white px-5 py-4 text-sm text-slate-900"
-                />
-                <button onClick={() => void sendChat(message)} disabled={sending || !message.trim()} className="inline-flex shrink-0 items-center justify-center gap-2 rounded-[1.5rem] bg-slate-900 px-5 py-4 text-sm font-black uppercase tracking-[0.3em] text-white disabled:cursor-not-allowed disabled:opacity-60"><Send className="h-4 w-4" /> Send</button>
-              </div>
+    <div className="coach-page">
+      <section className="coach-page__workspace">
+        <header className="coach-page__topbar">
+          <div className="coach-page__brand">
+            <span className="coach-page__brand-mark"><Zap size={18} /></span>
+            <div>
+              <h2 className="coach-page__brand-title">FinPilot Intelligence</h2>
+              <p className="coach-page__brand-status"><span className="coach-page__brand-status-dot" /> Agents online</p>
             </div>
           </div>
-        </GlassCard>
+          <button type="button" className="coach-page__topbar-action" aria-label="More options">
+            <MoreVertical size={18} />
+          </button>
+        </header>
 
-        <div className="min-h-0 min-w-0 space-y-4 xl:flex xl:flex-col xl:gap-4 xl:space-y-0">
-          <GlassCard>
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-xs font-black uppercase tracking-[0.35em] text-slate-400">Suggested prompts</p>
-                <h4 className="mt-2 text-xl font-black text-slate-900">Message ideas</h4>
+        {error ? <div className="coach-page__feedback">{error}</div> : null}
+
+        <div className="coach-page__layout">
+          <main className="coach-page__chat-panel">
+            <div className="coach-page__chat-header">
+              <div className="coach-page__chat-header-main">
+                <p className="coach-page__section-eyebrow">AI financial command</p>
+                <h3 className="coach-page__chat-title">{headerTitle}</h3>
+                <p className="coach-page__chat-copy">
+                  Ask about spending, budgets, anomaly detection, investment direction, or monthly reporting. The coach will route to the right specialist automatically.
+                </p>
               </div>
-              <Sparkles className="h-5 w-5 text-violet-500" />
+              <div className="coach-page__header-badges">
+                <Badge tone="slate">{userTurns.length} messages</Badge>
+                <Badge tone="emerald">Live context</Badge>
+              </div>
             </div>
-            <div className="mt-4 space-y-3">
-              {suggestions.map((chip) => (
-                <button key={chip} onClick={() => void sendChat(chip)} disabled={sending} className="flex w-full items-center justify-between rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm text-slate-700 transition hover:border-slate-300 hover:bg-white disabled:cursor-not-allowed disabled:opacity-60">
-                  <span>{chip}</span>
-                  <CornerDownRight className="h-4 w-4 text-slate-500" />
+
+            <div className="coach-page__prompt-strip" aria-label="Suggested prompts">
+              {suggestions.map((prompt) => (
+                <button key={prompt} type="button" className="coach-page__prompt-chip" onClick={() => void handleSend(prompt)}>
+                  {prompt}
                 </button>
               ))}
             </div>
-          </GlassCard>
 
-          <GlassCard className="shrink-0">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <p className="text-xs font-black uppercase tracking-[0.35em] text-slate-400">What the coach can do</p>
-                <h4 className="mt-2 text-xl font-black text-slate-900">Built-in specialties</h4>
-              </div>
-              <Badge tone="slate">Auto routed</Badge>
-            </div>
-            <div className="mt-4 space-y-3">
-              {[
-                'Spending guidance and category reduction ideas',
-                'Budget risk checks and safe-to-spend help',
-                'Suspicious transaction explanations',
-                'Monthly report and surplus planning support'
-              ].map((item) => (
-                <div key={item} className="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">
-                  {item}
-                </div>
+            <div className="coach-page__message-list">
+              {messages.map((message) => (
+                <ChatBubble key={message.id} message={message} />
               ))}
+
+              {isTyping ? (
+                <div className="coach-page__message-row coach-page__message-row--assistant">
+                  <div className="coach-page__typing">
+                    <span className="coach-page__typing-dot" />
+                    <span className="coach-page__typing-dot" />
+                    <span className="coach-page__typing-dot" />
+                  </div>
+                </div>
+              ) : null}
+
+              <div ref={messagesEndRef} />
             </div>
-          </GlassCard>
+
+            <footer className="coach-page__composer-shell">
+              <div className="coach-page__composer-row">
+                <button type="button" className="coach-page__composer-icon" aria-label="Attach context">
+                  <Paperclip size={18} />
+                </button>
+                <input
+                  value={inputValue}
+                  onChange={(event) => setInputValue(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' && !event.shiftKey) {
+                      event.preventDefault();
+                      void handleSend(inputValue);
+                    }
+                  }}
+                  placeholder="Ask your AI financial command…"
+                  className="coach-page__composer-input"
+                />
+                <button
+                  type="button"
+                  className={`coach-page__send-button${inputValue.trim() ? ' coach-page__send-button--ready' : ''}`}
+                  onClick={() => void handleSend(inputValue)}
+                  disabled={!inputValue.trim()}
+                  aria-label="Send prompt"
+                >
+                  {inputValue.trim() ? <ArrowUpRight size={20} strokeWidth={2.4} /> : <Send size={18} strokeWidth={2.4} />}
+                </button>
+              </div>
+
+              <div className="coach-page__disclaimer">
+                <Info size={12} />
+                <p>AI-generated guidance may be incomplete. Verify any critical financial action before acting.</p>
+              </div>
+            </footer>
+          </main>
+
+          <aside className="coach-page__side-column">
+            <section className="coach-page__panel coach-page__panel--suggestions">
+              <div className="coach-page__panel-header">
+                <div>
+                  <p className="coach-page__section-eyebrow">Suggested prompts</p>
+                  <h4 className="coach-page__panel-title">Fast ways to begin</h4>
+                </div>
+                <Sparkles size={16} />
+              </div>
+              <div className="coach-page__suggestion-list">
+                {suggestions.map((prompt) => (
+                  <button key={`${prompt}-side`} type="button" className="coach-page__suggestion-card" onClick={() => void handleSend(prompt)}>
+                    <span>{prompt}</span>
+                    <ChevronRight size={14} />
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            <section className="coach-page__panel coach-page__panel--capabilities">
+              <div className="coach-page__panel-header">
+                <div>
+                  <p className="coach-page__section-eyebrow">Specialists online</p>
+                  <h4 className="coach-page__panel-title">What the coach can do</h4>
+                </div>
+                <Badge tone="slate">Auto routed</Badge>
+              </div>
+              <div className="coach-page__capability-list">
+                <article className="coach-page__capability-card coach-page__capability-card--indigo">
+                  <Sparkles size={16} />
+                  <div>
+                    <h5>Core advisor</h5>
+                    <p>Talk through spending pressure, next actions, and monthly positioning.</p>
+                  </div>
+                </article>
+                <article className="coach-page__capability-card coach-page__capability-card--rose">
+                  <ShieldAlert size={16} />
+                  <div>
+                    <h5>Anomaly review</h5>
+                    <p>Spot unusual transactions and frame the safest next check.</p>
+                  </div>
+                </article>
+                <article className="coach-page__capability-card coach-page__capability-card--amber">
+                  <PieChart size={16} />
+                  <div>
+                    <h5>Budget advisor</h5>
+                    <p>Explain overspend risk and suggest a recovery move before month end.</p>
+                  </div>
+                </article>
+                <article className="coach-page__capability-card coach-page__capability-card--emerald">
+                  <TrendingUp size={16} />
+                  <div>
+                    <h5>Investment guide</h5>
+                    <p>Translate surplus cash flow into clearer goal or allocation options.</p>
+                  </div>
+                </article>
+              </div>
+            </section>
+          </aside>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

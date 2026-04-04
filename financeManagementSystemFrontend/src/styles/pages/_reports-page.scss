@@ -1,0 +1,291 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+.reports-page {
+  display: grid;
+  gap: $space-6;
+
+  &__header-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $space-3;
+  }
+
+  &__feedback {
+    color: $color-danger;
+    background: $color-danger-soft;
+    border-color: rgba(195, 62, 77, 0.18);
+  }
+
+  &__summary-grid,
+  &__priority-grid,
+  &__net-worth-grid,
+  &__detail-list,
+  &__assumptions,
+  &__trend-list,
+  &__modal-layout,
+  &__checkpoint-grid {
+    display: grid;
+    gap: $space-3;
+  }
+
+  &__summary-grid {
+    @media (min-width: 760px) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @media (min-width: 1280px) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  &__top-grid {
+    display: grid;
+    gap: $space-6;
+
+    @media (min-width: 1280px) {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+    }
+  }
+
+  &__priority-grid,
+  &__net-worth-grid {
+    @media (min-width: 760px) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  &__summary-card,
+  &__priority-card,
+  &__trend-card,
+  &__net-worth-card,
+  &__assumption,
+  &__detail-item,
+  &__forecast-card,
+  &__checkpoint {
+    border: 1px solid $color-border;
+    border-radius: $radius-card;
+    background: $color-surface-alt;
+  }
+
+  &__summary-card,
+  &__priority-card,
+  &__trend-card,
+  &__net-worth-card,
+  &__forecast-card {
+    padding: $space-5;
+  }
+
+  &__summary-label,
+  &__net-worth-label,
+  &__mini-eyebrow,
+  &__trend-label,
+  &__daily-label {
+    @include eyebrow;
+    margin: 0;
+  }
+
+  &__summary-value,
+  &__priority-title,
+  &__net-worth-value,
+  &__forecast-legend-value,
+  &__checkpoint-value {
+    margin: $space-4 0 0;
+    font-size: 2.1rem;
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    color: $color-text;
+
+    &--violet {
+      color: $color-violet;
+    }
+
+    &--positive {
+      color: $color-success;
+    }
+
+    &--negative {
+      color: $color-danger;
+    }
+  }
+
+  &__forecast-legend-value,
+  &__checkpoint-value {
+    font-size: 1rem;
+    margin-top: $space-2;
+    letter-spacing: -0.02em;
+  }
+
+  &__priority-copy,
+  &__summary-note,
+  &__net-worth-note,
+  &__detail-copy,
+  &__detail-note,
+  &__checkpoint-note {
+    margin: $space-2 0 0;
+    color: $color-text-muted;
+    font-size: 0.92rem;
+    line-height: 1.7;
+  }
+
+  &__detail-item {
+    @include button-reset;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: start;
+    gap: $space-4;
+    width: 100%;
+    padding: $space-4;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+
+    &:hover {
+      border-color: $color-border-strong;
+      background: $color-surface-raised;
+      transform: translateY(-1px);
+    }
+  }
+
+  &__detail-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: $color-accent-soft;
+    color: $color-accent;
+  }
+
+  &__detail-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $space-2;
+  }
+
+  &__detail-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  &__detail-arrow {
+    color: $color-text-soft;
+    margin-top: $space-1;
+  }
+
+  &__modal-section {
+    display: grid;
+    gap: $space-4;
+  }
+
+  &__forecast-card {
+    gap: $space-4;
+    display: grid;
+  }
+
+  &__forecast-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: $space-4;
+  }
+
+  &__forecast-chart {
+    padding: $space-3;
+    border: 1px solid rgba(93, 86, 214, 0.14);
+    border-radius: $radius-card;
+    background: linear-gradient(180deg, rgba(93, 86, 214, 0.06) 0%, rgba(255, 255, 255, 0.9) 100%);
+  }
+
+  &__forecast-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  &__forecast-axis {
+    stroke: rgba(140, 153, 175, 0.48);
+    stroke-width: 1;
+  }
+
+  &__forecast-area {
+    fill: url(#forecast-area);
+  }
+
+  &__forecast-line {
+    fill: none;
+    stroke: $color-violet;
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  &__forecast-point {
+    fill: $color-text;
+    stroke: #fff;
+    stroke-width: 3;
+
+    &--projected {
+      fill: $color-violet;
+    }
+  }
+
+  &__checkpoint-grid {
+    @media (min-width: 760px) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  &__checkpoint {
+    padding: $space-3;
+    background: $color-surface;
+  }
+
+  &__trend-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-3;
+  }
+
+  &__trend-metrics {
+    display: grid;
+    gap: $space-3;
+    margin-top: $space-4;
+
+    @media (min-width: 640px) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  &__trend-metric-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: $color-text-soft;
+  }
+
+  &__trend-metric-value {
+    margin: $space-1 0 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+
+    &--income {
+      color: $color-success;
+    }
+
+    &--expense,
+    &--negative {
+      color: $color-danger;
+    }
+
+    &--default {
+      color: $color-text;
+    }
+  }
+}

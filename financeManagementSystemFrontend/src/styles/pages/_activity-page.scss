@@ -1,0 +1,157 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+.activity-page {
+  display: grid;
+  gap: $space-6;
+
+  &__feedback {
+    color: $color-danger;
+    background: $color-danger-soft;
+    border-color: rgba(195, 62, 77, 0.18);
+  }
+
+  &__toolbar {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    margin-bottom: $space-5;
+  }
+
+  &__search {
+    position: relative;
+    display: block;
+    flex: 1;
+  }
+
+  &__search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $color-text-soft;
+    pointer-events: none;
+  }
+
+  &__search-input {
+    padding-left: 44px;
+  }
+
+  &__toolbar-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid $color-border;
+    border-radius: $radius-control;
+    background: $color-surface-alt;
+    color: $color-text-muted;
+  }
+
+  &__list {
+    display: grid;
+    gap: $space-3;
+  }
+
+  &__item {
+    display: grid;
+    gap: $space-4;
+    padding: $space-5;
+    border: 1px solid $color-border;
+    border-radius: $radius-card;
+    background: $color-surface-alt;
+  }
+
+  &__item-head {
+    display: grid;
+    gap: $space-3;
+
+    @media (min-width: 900px) {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+    }
+  }
+
+  &__item-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $space-3;
+  }
+
+  &__timestamp {
+    @include eyebrow;
+    margin: 0;
+    color: $color-text-soft;
+  }
+
+  &__entity-id {
+    margin: 0;
+    color: $color-text-muted;
+    font-size: 0.92rem;
+  }
+
+  &__tabs {
+    display: inline-flex;
+    width: fit-content;
+    padding: 4px;
+    border: 1px solid $color-border;
+    border-radius: $radius-control;
+    background: $color-surface;
+    gap: 4px;
+  }
+
+  &__tab {
+    @include button-reset;
+    padding: 0.7rem 1rem;
+    border-radius: 10px;
+    color: $color-text-muted;
+    font-size: 0.86rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+
+    &--active {
+      background: $color-accent-soft;
+      color: $color-accent;
+    }
+  }
+
+  &__values-panel {
+    padding: $space-4;
+    border: 1px solid $color-border;
+    border-radius: $radius-card;
+    background: $color-surface;
+  }
+
+  &__values-list {
+    display: grid;
+    gap: $space-3;
+  }
+
+  &__value-row {
+    display: grid;
+    gap: $space-1;
+    padding-bottom: $space-3;
+    border-bottom: 1px solid $color-border;
+
+    &:last-child {
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+  }
+
+  &__value-key {
+    @include eyebrow;
+    margin: 0;
+  }
+
+  &__value-text,
+  &__empty-values {
+    margin: 0;
+    color: $color-text-muted;
+    line-height: 1.7;
+    word-break: break-word;
+  }
+}

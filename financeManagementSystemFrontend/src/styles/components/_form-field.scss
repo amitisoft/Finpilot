@@ -1,0 +1,28 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+.app-form-field {
+  display: grid;
+  gap: $space-2;
+
+  &__label {
+    @include eyebrow;
+    margin: 0;
+  }
+
+  &__hint {
+    color: $color-text-soft;
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+
+  &__error {
+    color: $color-danger;
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+
+  &--error .app-form-control {
+    border-color: rgba(195, 62, 77, 0.4);
+  }
+}

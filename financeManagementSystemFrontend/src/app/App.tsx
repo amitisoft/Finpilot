@@ -11,6 +11,7 @@ import { CoachPage } from '../pages/CoachPage';
 import { DashboardPage } from '../pages/DashboardPage';
 import { GoalsPage } from '../pages/GoalsPage';
 import { InsightsPage } from '../pages/InsightsPage';
+import { ReportsPage } from '../pages/ReportsPage';
 import { TransactionsPage } from '../pages/TransactionsPage';
 
 function ProtectedLayout() {
@@ -39,6 +40,7 @@ export default function App() {
         <Route path="transactions" element={<TransactionsPage />} />
         <Route path="budgets" element={<BudgetsPage />} />
         <Route path="goals" element={<GoalsPage />} />
+        <Route path="reports" element={<ReportsPage />} />
         <Route path="insights" element={<InsightsPage />} />
         <Route path="coach" element={<CoachPage />} />
         <Route path="categories" element={<CategoriesPage />} />

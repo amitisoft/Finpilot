@@ -1,0 +1,96 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+:root {
+  color-scheme: light;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #f6f8fc;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  color: $color-text;
+  background:
+    radial-gradient(circle at top left, rgba(45, 91, 255, 0.06), transparent 22%),
+    radial-gradient(circle at top right, rgba(93, 86, 214, 0.05), transparent 18%),
+    linear-gradient(180deg, #fbfcfe 0%, #f4f7fb 100%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+input,
+select,
+textarea {
+  color: $color-text;
+}
+
+.app-root {
+  min-height: 100%;
+}
+
+.app-form-control {
+  width: 100%;
+  border: 1px solid $color-border;
+  border-radius: $radius-control;
+  background: $color-surface;
+  color: $color-text;
+  padding: 0.9rem 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+
+  &:focus {
+    @include focus-ring;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+    background: $color-surface-alt;
+  }
+
+  &--select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 3.25rem;
+    background-image: url($app-select-icon);
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1rem;
+
+    &::-ms-expand {
+      display: none;
+    }
+  }
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(140, 153, 175, 0.45);
+  border-radius: $radius-pill;
+}

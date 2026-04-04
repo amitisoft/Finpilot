@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Pencil, Plus, Target, Trash2 } from 'lucide-react';
-import { Badge, EmptyState, GlassCard, LoadingPanel, NumberInput, SectionTitle } from '../components/Ui';
+import { Button } from '../components/Button';
+import { FormField } from '../components/FormField';
+import { PageIntro } from '../components/PageIntro';
+import { Badge, EmptyState, GlassCard, LoadingPanel } from '../components/Ui';
 import { useAuth } from '../contexts/AuthContext';
 import { flattenErrors, formatCurrency, formatDate, goalStatusLabels } from '../lib/utils';
 import type { GoalResponse } from '../types/api';
@@ -30,7 +33,10 @@ export function GoalsPage() {
 
   useEffect(() => { void load(); }, []);
   useEffect(() => {
-    if (!selected) return void setForm(emptyForm);
+    if (!selected) {
+      setForm(emptyForm);
+      return;
+    }
     setForm({
       name: selected.name,
       targetAmount: selected.targetAmount,
@@ -73,36 +79,43 @@ export function GoalsPage() {
   if (loading) return <LoadingPanel label="Loading strategic goals…" />;
 
   return (
-    <div className="space-y-6">
-      <SectionTitle eyebrow="Strategic Goals" title="Progress-first financial milestones" action={<Badge tone="violet">{items.length} tracked</Badge>} />
-      {error && <GlassCard className="text-rose-200">{error}</GlassCard>}
-      <div className="grid gap-6 xl:grid-cols-[1.25fr_0.75fr]">
-        <div>
+    <div className="finance-page">
+      <PageIntro
+        eyebrow="Strategic goals"
+        title="Progress-first financial milestones"
+        description="Track the goals that matter most, whether they are emergency savings, major purchases, or long-horizon financial targets."
+        aside={<Badge tone="violet">{items.length} tracked</Badge>}
+      />
+
+      {error ? <GlassCard className="finance-page__feedback">{error}</GlassCard> : null}
+
+      <div className="finance-page__grid finance-page__grid--goals">
+        <div className="finance-page__stack">
           {items.length === 0 ? (
-            <EmptyState title="No goals yet" description="Create a savings or financial milestone goal to track progress visually." />
+            <div className="finance-page__empty">
+              <EmptyState title="No goals yet" description="Create a savings or financial milestone goal to track progress visually." />
+            </div>
           ) : (
-            <div className="grid gap-5 md:grid-cols-2">
+            <div className="finance-page__cards">
               {items.map((goal) => (
-                <GlassCard key={goal.id} className="relative overflow-hidden">
-                  <Target className="absolute right-5 top-5 h-20 w-20 text-white/10" />
-                  <div className="relative">
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="text-xs font-black uppercase tracking-[0.35em] text-slate-400">Target date</p>
-                        <p className="mt-2 text-sm text-slate-600">{formatDate(goal.targetDate)}</p>
-                      </div>
-                      <Badge tone={goal.status === 2 ? 'emerald' : goal.status === 3 ? 'slate' : 'violet'}>{goalStatusLabels[goal.status]}</Badge>
+                <GlassCard key={goal.id} className="finance-page__card">
+                  <Target className="finance-page__goal-watermark" />
+                  <div className="finance-page__card-top">
+                    <div>
+                      <p className="finance-page__card-eyebrow">Target date</p>
+                      <p className="finance-page__card-subtitle">{formatDate(goal.targetDate)}</p>
                     </div>
-                    <h3 className="mt-6 text-3xl font-black">{goal.name}</h3>
-                    <p className="mt-4 text-4xl font-black tracking-tighter">{goal.progressPercent.toFixed(0)}%</p>
-                    <p className="mt-2 text-sm text-slate-600">{formatCurrency(goal.currentAmount)} of {formatCurrency(goal.targetAmount)}</p>
-                    <div className="mt-5 h-3 overflow-hidden rounded-full bg-slate-200">
-                      <div className="h-full rounded-full bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500" style={{ width: `${Math.min(goal.progressPercent, 100)}%` }} />
-                    </div>
-                    <div className="mt-5 flex items-center gap-5 text-xs font-black uppercase tracking-[0.3em]">
-                      <button onClick={() => setSelected(goal)} className="inline-flex items-center gap-2 text-slate-700"><Pencil className="h-4 w-4" />Edit</button>
-                      <button onClick={() => void remove(goal.id)} className="inline-flex items-center gap-2 text-rose-200"><Trash2 className="h-4 w-4" />Delete</button>
-                    </div>
+                    <Badge tone={goal.status === 2 ? 'emerald' : goal.status === 3 ? 'slate' : 'violet'}>{goalStatusLabels[goal.status]}</Badge>
+                  </div>
+                  <h3 className="finance-page__card-title">{goal.name}</h3>
+                  <p className="finance-page__card-value">{goal.progressPercent.toFixed(0)}%</p>
+                  <p className="finance-page__card-note">{formatCurrency(goal.currentAmount)} of {formatCurrency(goal.targetAmount)}</p>
+                  <div className="finance-page__progress">
+                    <div className="finance-page__progress-fill" style={{ width: `${Math.min(goal.progressPercent, 100)}%` }} />
+                  </div>
+                  <div className="finance-page__card-actions">
+                    <Button variant="secondary" size="sm" onClick={() => setSelected(goal)} iconLeading={<Pencil size={14} />}>Edit</Button>
+                    <Button variant="ghost" size="sm" onClick={() => void remove(goal.id)} iconLeading={<Trash2 size={14} />} className="finance-page__danger-button">Delete</Button>
                   </div>
                 </GlassCard>
               ))}
@@ -110,21 +123,45 @@ export function GoalsPage() {
           )}
         </div>
 
-        <GlassCard>
-          <SectionTitle eyebrow="Goal editor" title={selected ? 'Update goal' : 'Create goal'} action={<button onClick={() => setSelected(null)} className="rounded-full bg-white/10 px-3 py-1 text-xs font-black uppercase tracking-[0.3em] text-slate-600"><Plus className="inline h-3 w-3" /> New</button>} />
-          <form onSubmit={submit} className="space-y-4">
-            <label className="block"><span className="mb-2 block text-xs font-black uppercase tracking-[0.35em] text-slate-400">Name</span><input value={form.name} onChange={(e) => setForm((current) => ({ ...current, name: e.target.value }))} required className="app-form-control w-full" /></label>
-            <label className="block"><span className="mb-2 block text-xs font-black uppercase tracking-[0.35em] text-slate-400">Target amount</span><NumberInput min="1" step="0.01" value={form.targetAmount} onValueChange={(targetAmount) => setForm((current) => ({ ...current, targetAmount }))} className="app-form-control w-full" /></label>
-            <label className="block"><span className="mb-2 block text-xs font-black uppercase tracking-[0.35em] text-slate-400">Current amount</span><NumberInput min="0" step="0.01" value={form.currentAmount} blankWhenZero placeholder="0" onValueChange={(currentAmount) => setForm((current) => ({ ...current, currentAmount }))} className="app-form-control w-full" /></label>
-            <label className="block"><span className="mb-2 block text-xs font-black uppercase tracking-[0.35em] text-slate-400">Target date</span><input type="date" value={form.targetDate} onChange={(e) => setForm((current) => ({ ...current, targetDate: e.target.value }))} className="app-form-control w-full" /></label>
-            {selected && (
-              <label className="block"><span className="mb-2 block text-xs font-black uppercase tracking-[0.35em] text-slate-400">Status</span><select value={form.status} onChange={(e) => setForm((current) => ({ ...current, status: Number(e.target.value) }))} className="app-form-control app-form-control--select w-full">{Object.entries(goalStatusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
-            )}
-            <button disabled={submitting} className="w-full rounded-3xl bg-white px-5 py-3 text-sm font-black uppercase tracking-[0.35em] text-slate-950 disabled:opacity-60">{submitting ? 'Saving…' : selected ? 'Update Goal' : 'Create Goal'}</button>
+        <GlassCard className="finance-page__editor">
+          <PageIntro
+            eyebrow="Goal editor"
+            title={selected ? 'Update goal' : 'Create goal'}
+            description="Define the target, current progress, and timeline so FinPilot can show realistic momentum."
+            aside={<Button variant="secondary" size="sm" onClick={() => setSelected(null)} iconLeading={<Plus size={14} />}>New</Button>}
+          />
+
+          <form onSubmit={submit} className="finance-page__form">
+            <FormField label="Name">
+              <input value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} required className="app-form-control" />
+            </FormField>
+
+            <FormField label="Target amount">
+              <input value={form.targetAmount} onChange={(event) => setForm((current) => ({ ...current, targetAmount: Number(event.target.value) || 0 }))} type="number" min="1" step="0.01" className="app-form-control" />
+            </FormField>
+
+            <FormField label="Current amount">
+              <input value={form.currentAmount} onChange={(event) => setForm((current) => ({ ...current, currentAmount: Number(event.target.value) || 0 }))} type="number" min="0" step="0.01" className="app-form-control" />
+            </FormField>
+
+            <FormField label="Target date">
+              <input type="date" value={form.targetDate} onChange={(event) => setForm((current) => ({ ...current, targetDate: event.target.value }))} className="app-form-control" />
+            </FormField>
+
+            {selected ? (
+              <FormField label="Status">
+                <select value={form.status} onChange={(event) => setForm((current) => ({ ...current, status: Number(event.target.value) }))} className="app-form-control app-form-control--select">
+                  {Object.entries(goalStatusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                </select>
+              </FormField>
+            ) : null}
+
+            <Button type="submit" fullWidth size="lg" disabled={submitting}>
+              {submitting ? 'Saving…' : selected ? 'Update goal' : 'Create goal'}
+            </Button>
           </form>
         </GlassCard>
       </div>
     </div>
   );
 }
-

@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Banknote, CreditCard, Pencil, Plus, Trash2, Wallet, Zap } from 'lucide-react';
-import { Badge, EmptyState, GlassCard, LoadingPanel, NumberInput, SectionTitle } from '../components/Ui';
+import { Button } from '../components/Button';
+import { FormField } from '../components/FormField';
+import { PageIntro } from '../components/PageIntro';
+import { Badge, EmptyState, GlassCard, LoadingPanel } from '../components/Ui';
 import { useAuth } from '../contexts/AuthContext';
 import { accountTypeLabels, flattenErrors, formatCurrency } from '../lib/utils';
 import type { AccountResponse } from '../types/api';
@@ -8,10 +11,10 @@ import type { AccountResponse } from '../types/api';
 const emptyForm = { name: '', type: 2, currency: 'INR', openingBalance: 0 };
 
 function AccountIcon({ type }: { type: number }) {
-  if (type === 2) return <CreditCard className="h-5 w-5" />;
-  if (type === 1 || type === 4) return <Wallet className="h-5 w-5" />;
-  if (type === 5) return <Zap className="h-5 w-5" />;
-  return <Banknote className="h-5 w-5" />;
+  if (type === 2) return <CreditCard size={20} />;
+  if (type === 1 || type === 4) return <Wallet size={20} />;
+  if (type === 5) return <Zap size={20} />;
+  return <Banknote size={20} />;
 }
 
 export function AccountsPage() {
@@ -27,8 +30,7 @@ export function AccountsPage() {
     setLoading(true);
     setError(null);
     try {
-      const items = await api.get<AccountResponse[]>('/api/accounts');
-      setAccounts(items);
+      setAccounts(await api.get<AccountResponse[]>('/api/accounts'));
     } catch (loadError) {
       setError(flattenErrors(loadError));
     } finally {
@@ -60,6 +62,7 @@ export function AccountsPage() {
     event.preventDefault();
     setSubmitting(true);
     setError(null);
+
     try {
       if (selected) {
         await api.put(`/api/accounts/${selected.id}`, form);
@@ -88,31 +91,37 @@ export function AccountsPage() {
   if (loading) return <LoadingPanel label="Loading capital accounts…" />;
 
   return (
-    <div className="space-y-6">
-      <SectionTitle eyebrow="Capital Accounts" title="Where your money lives" action={<Badge tone="emerald">{formatCurrency(totalBalance)}</Badge>} />
+    <div className="finance-page">
+      <PageIntro
+        eyebrow="Capital accounts"
+        title="Where your money lives"
+        description="Keep banks, wallets, cash, and investment balances structured in one place so the rest of the workspace has a reliable base."
+        aside={<Badge tone="emerald">{formatCurrency(totalBalance)}</Badge>}
+      />
 
-      {error && <GlassCard className="text-rose-200">{error}</GlassCard>}
+      {error ? <GlassCard className="finance-page__feedback">{error}</GlassCard> : null}
 
-      <div className="grid gap-6 xl:grid-cols-[1.3fr_0.7fr]">
-        <div>
+      <div className="finance-page__grid">
+        <div className="finance-page__stack">
           {accounts.length === 0 ? (
-            <EmptyState title="No accounts created" description="Add your first bank, wallet, cash, or investment account to activate FinPilot." />
+            <div className="finance-page__empty">
+              <EmptyState title="No accounts created" description="Add your first bank, wallet, cash, or investment account to activate FinPilot." />
+            </div>
           ) : (
-            <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            <div className="finance-page__cards finance-page__cards--compact">
               {accounts.map((account) => (
-                <GlassCard key={account.id} className="min-h-[220px]">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="rounded-3xl bg-white/10 p-4 text-violet-200">
-                      <AccountIcon type={account.type} />
-                    </div>
+                <GlassCard key={account.id} className="finance-page__card">
+                  <div className="finance-page__card-header">
+                    <span className="finance-page__card-icon"><AccountIcon type={account.type} /></span>
                     <Badge tone="slate">{accountTypeLabels[account.type]}</Badge>
                   </div>
-                  <p className="mt-8 text-xs font-black uppercase tracking-[0.35em] text-slate-400">{account.currency}</p>
-                  <h3 className="mt-2 text-2xl font-black">{account.name}</h3>
-                  <p className="mt-4 text-4xl font-black tracking-tighter">{formatCurrency(account.currentBalance, account.currency)}</p>
-                  <div className="mt-6 flex items-center justify-between gap-3 text-xs font-black uppercase tracking-[0.3em]">
-                    <button onClick={() => setSelected(account)} className="inline-flex items-center gap-2 text-slate-700"><Pencil className="h-4 w-4" />Details</button>
-                    <button onClick={() => void remove(account.id)} className="inline-flex items-center gap-2 text-rose-200"><Trash2 className="h-4 w-4" />Transfer</button>
+                  <p className="finance-page__card-eyebrow">{account.currency}</p>
+                  <h3 className="finance-page__card-title">{account.name}</h3>
+                  <p className="finance-page__card-value">{formatCurrency(account.currentBalance, account.currency)}</p>
+                  <p className="finance-page__card-note">Opening balance {formatCurrency(account.openingBalance, account.currency)}</p>
+                  <div className="finance-page__card-actions">
+                    <Button variant="secondary" size="sm" onClick={() => setSelected(account)} iconLeading={<Pencil size={14} />}>Edit</Button>
+                    <Button variant="ghost" size="sm" onClick={() => void remove(account.id)} iconLeading={<Trash2 size={14} />} className="finance-page__danger-button">Delete</Button>
                   </div>
                 </GlassCard>
               ))}
@@ -120,28 +129,36 @@ export function AccountsPage() {
           )}
         </div>
 
-        <GlassCard>
-          <SectionTitle eyebrow="Account editor" title={selected ? 'Update account' : 'Add account'} action={<button onClick={() => setSelected(null)} className="rounded-full bg-white/10 px-3 py-1 text-xs font-black uppercase tracking-[0.3em] text-slate-600"><Plus className="inline h-3 w-3" /> New</button>} />
-          <form onSubmit={submit} className="space-y-4">
-            <label className="block">
-              <span className="mb-2 block text-xs font-black uppercase tracking-[0.35em] text-slate-400">Name</span>
-              <input value={form.name} onChange={(e) => setForm((current) => ({ ...current, name: e.target.value }))} required className="app-form-control w-full" />
-            </label>
-            <label className="block">
-              <span className="mb-2 block text-xs font-black uppercase tracking-[0.35em] text-slate-400">Type</span>
-              <select value={form.type} onChange={(e) => setForm((current) => ({ ...current, type: Number(e.target.value) }))} className="app-form-control app-form-control--select w-full">
+        <GlassCard className="finance-page__editor">
+          <PageIntro
+            eyebrow="Account editor"
+            title={selected ? 'Update account' : 'Add account'}
+            description="Use consistent account labels and currencies so reports and forecasts stay clean."
+            aside={<Button variant="secondary" size="sm" onClick={() => setSelected(null)} iconLeading={<Plus size={14} />}>New</Button>}
+          />
+
+          <form onSubmit={submit} className="finance-page__form">
+            <FormField label="Name">
+              <input value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} required className="app-form-control" />
+            </FormField>
+
+            <FormField label="Type">
+              <select value={form.type} onChange={(event) => setForm((current) => ({ ...current, type: Number(event.target.value) }))} className="app-form-control app-form-control--select">
                 {Object.entries(accountTypeLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
               </select>
-            </label>
-            <label className="block">
-              <span className="mb-2 block text-xs font-black uppercase tracking-[0.35em] text-slate-400">Currency</span>
-              <input value={form.currency} onChange={(e) => setForm((current) => ({ ...current, currency: e.target.value.toUpperCase() }))} required className="app-form-control w-full" />
-            </label>
-            <label className="block">
-              <span className="mb-2 block text-xs font-black uppercase tracking-[0.35em] text-slate-400">Opening balance</span>
-              <NumberInput min="0" step="0.01" value={form.openingBalance} blankWhenZero placeholder="0" onValueChange={(openingBalance) => setForm((current) => ({ ...current, openingBalance }))} className="app-form-control w-full" />
-            </label>
-            <button disabled={submitting} className="w-full rounded-3xl bg-white px-5 py-3 text-sm font-black uppercase tracking-[0.35em] text-slate-950 disabled:opacity-60">{submitting ? 'Saving…' : selected ? 'Update Account' : 'Create Account'}</button>
+            </FormField>
+
+            <FormField label="Currency">
+              <input value={form.currency} onChange={(event) => setForm((current) => ({ ...current, currency: event.target.value.toUpperCase() }))} required className="app-form-control" />
+            </FormField>
+
+            <FormField label="Opening balance">
+              <input value={form.openingBalance} onChange={(event) => setForm((current) => ({ ...current, openingBalance: Number(event.target.value) || 0 }))} type="number" min="0" step="0.01" className="app-form-control" />
+            </FormField>
+
+            <Button type="submit" fullWidth size="lg" disabled={submitting}>
+              {submitting ? 'Saving…' : selected ? 'Update account' : 'Create account'}
+            </Button>
           </form>
         </GlassCard>
       </div>

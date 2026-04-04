@@ -10,6 +10,13 @@ export interface ApiResponse<T> {
   errors: ApiError[] | null;
 }
 
+export interface RegistrationResponse {
+  userId: string;
+  fullName: string;
+  email: string;
+  requiresLogin: boolean;
+}
+
 export interface AuthResponse {
   userId: string;
   fullName: string;
@@ -132,6 +139,76 @@ export interface GoalProgressResponse {
   currentAmount: number;
   targetAmount: number;
   progressPercent: number;
+}
+
+export interface MonthlyForecastResponse {
+  currentBalance: number;
+  projectedEndOfMonthBalance: number;
+  projectedMonthNetAmount: number;
+  projectedRemainingNetAmount: number;
+  averageDailyNetAmount: number;
+  daysTracked: number;
+  daysRemaining: number;
+  confidence: string;
+  assumptions: string[];
+  generatedAt: string;
+}
+
+export interface DailyForecastPointResponse {
+  date: string;
+  label: string;
+  balance: number;
+  dailyNetAmount: number;
+  isProjected: boolean;
+}
+
+export interface ReportTrendPointResponse {
+  year: number;
+  month: number;
+  label: string;
+  income: number;
+  expense: number;
+  netAmount: number;
+}
+
+export interface NetWorthPointResponse {
+  year: number;
+  month: number;
+  label: string;
+  netWorth: number;
+}
+
+export interface HealthScoreBreakdownResponse {
+  category: string;
+  status: string;
+  summary: string;
+}
+
+export interface HealthScoreResponse {
+  score: number;
+  label: string;
+  breakdown: HealthScoreBreakdownResponse[];
+  strengths: string[];
+  risks: string[];
+  suggestions: string[];
+  generatedAt: string;
+  disclaimer: string;
+}
+
+export interface InsightsOverviewSectionResponse {
+  key: string;
+  title: string;
+  headline: string;
+  priority: string;
+}
+
+export interface InsightsOverviewResponse {
+  headline: string;
+  healthScore: number;
+  healthLabel: string;
+  sections: InsightsOverviewSectionResponse[];
+  generatedAt: string;
+  disclaimer: string;
 }
 
 export interface InsightCardResponse {

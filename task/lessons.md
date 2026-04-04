@@ -12,3 +12,24 @@
 
 - Do not introduce paid external AI providers or assume key-based integrations are acceptable without explicit user approval. If the user wants a self-contained or hackathon-safe setup, stay local/deterministic unless they opt in.
 - For hackathon deployments, do not keep optional infrastructure like Redis as a hard dependency unless the user explicitly wants that extra service. Prefer simpler in-memory fallbacks first.
+- The dashboard should stay a concise command center. Do not embed large empty-state sections for accounts, budgets, goals, or other features when dedicated pages already exist; show brief summaries and route users into the relevant page instead.
+
+- Segmented controls like Login/Register should be built with nowrap-safe sizing and explicit flex behavior. Do not let auth mode toggles wrap or collapse under narrower content widths.
+
+- When the user asks for SCSS-heavy cleanup, move touched pages/components to semantic BEM-style classes and avoid introducing new Tailwind utility markup in the implementation slice.
+
+- When migrating pages away from utility styling, add dedicated page-level SCSS partials and import them immediately in index.scss to keep the build green while the migration is in progress.
+
+- Avoid return-state phrasing like 'Welcome back' when the UI cannot actually know if the user is returning; prefer neutral financial-workspace copy.
+
+- When extending the design system, move core finance CRUD pages onto shared page-intro/button/form-field patterns instead of leaving them on mixed old utility markup.
+
+- For dense finance workspaces, keep desktop navigation as a compact icon rail with hover labels and move account actions into an avatar menu. Avoid permanently occupying large sidebar space with marketing copy when the user asks for a minimal full-width layout.
+
+- When an analytics page grows taller than the viewport with secondary charts and report bundles, keep the top of the page reserved for summary decisions and move deep detail into reusable modal or drawer views launched from a short list of cards.
+
+- When a viewport-bounded shell is requested, use explicit height: 100vh plus child height: 100% and min-height: 0 on flex containers. Using only min-height in the shell can let side rails visually extend past the screen.
+
+- Raw serialized JSON should not be exposed directly in user-facing audit history. Prefer a readable field list and, when both old and new states exist, simple tabs or toggles instead of raw payload dumps.
+
+- When the user provides a generated design mock or HTML/Tailwind prototype, translate its interaction and hierarchy into the app's SCSS/BEM component system instead of copying utility-heavy markup directly.

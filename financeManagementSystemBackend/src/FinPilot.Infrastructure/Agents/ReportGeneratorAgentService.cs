@@ -10,6 +10,11 @@ public sealed class ReportGeneratorAgentService(InsightContextBuilder contextBui
     public async Task<ReportGeneratorAnalysisResponse> AnalyzeAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         var context = await contextBuilder.BuildAsync(userId, 6, cancellationToken);
+        return Analyze(context);
+    }
+
+    public ReportGeneratorAnalysisResponse Analyze(InsightContext context)
+    {
         var highlights = new List<string>
         {
             $"Income this month: {context.Summary.TotalIncome:0.##}",
@@ -60,6 +65,7 @@ public sealed class ReportGeneratorAgentService(InsightContextBuilder contextBui
         {
             builder.AppendLine("- No active budgets found for the current period.");
         }
+
         builder.AppendLine();
         builder.AppendLine("## Goals");
         if (context.Goals.Any())
@@ -73,6 +79,7 @@ public sealed class ReportGeneratorAgentService(InsightContextBuilder contextBui
         {
             builder.AppendLine("- No active goals found.");
         }
+
         builder.AppendLine();
         builder.AppendLine("## Forecast");
         builder.AppendLine($"- {forecast}");

@@ -1,0 +1,212 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+.insights-page {
+  display: grid;
+  gap: $space-6;
+
+  &__feedback {
+    color: $color-danger;
+    background: $color-danger-soft;
+    border-color: rgba(195, 62, 77, 0.18);
+  }
+
+  &__overview-grid,
+  &__strength-grid,
+  &__bundle-list,
+  &__cards,
+  &__recommendations,
+  &__focus-list,
+  &__strength-list,
+  &__modal-layout {
+    display: grid;
+    gap: $space-4;
+  }
+
+  &__overview-grid {
+    @media (min-width: 1280px) {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+  }
+
+  &__health-panel {
+    @media (min-width: 1280px) {
+      grid-column: span 5;
+    }
+  }
+
+  &__summary-panel {
+    @media (min-width: 1280px) {
+      grid-column: span 7;
+    }
+  }
+
+  &__score-header,
+  &__section-header,
+  &__card-header,
+  &__overview-section-head,
+  &__bundle-head,
+  &__modal-meta {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: $space-4;
+  }
+
+  &__eyebrow,
+  &__mini-eyebrow,
+  &__generated-at {
+    @include eyebrow;
+    margin: 0;
+  }
+
+  &__score-value {
+    margin: $space-2 0 0;
+    font-size: 3rem;
+    line-height: 0.95;
+    font-weight: 800;
+    letter-spacing: -0.05em;
+  }
+
+  &__score-copy,
+  &__card-copy,
+  &__disclaimer {
+    margin: $space-2 0 0;
+    color: $color-text-muted;
+    line-height: 1.7;
+  }
+
+  &__breakdown-list,
+  &__bundle-list,
+  &__cards,
+  &__strength-grid {
+    margin-top: $space-5;
+  }
+
+  &__breakdown-card,
+  &__overview-card,
+  &__signal-card,
+  &__recommendation,
+  &__focus-item,
+  &__strength-item,
+  &__bundle-item {
+    border: 1px solid $color-border;
+    border-radius: $radius-card;
+    background: $color-surface-alt;
+  }
+
+  &__breakdown-card,
+  &__overview-card,
+  &__signal-card,
+  &__focus-box,
+  &__strength-box {
+    padding: $space-5;
+  }
+
+  &__breakdown-head,
+  &__overview-section-head,
+  &__bundle-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-3;
+  }
+
+  &__breakdown-title,
+  &__signal-title,
+  &__overview-title,
+  &__bundle-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  &__overview-lanes,
+  &__strength-grid {
+    display: grid;
+    gap: $space-4;
+    margin-top: $space-5;
+
+    @media (min-width: 900px) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  &__focus-box {
+    border: 1px solid rgba(161, 93, 0, 0.18);
+    border-radius: $radius-card;
+    background: $color-warning-soft;
+  }
+
+  &__strength-box {
+    border: 1px solid rgba(18, 128, 92, 0.18);
+    border-radius: $radius-card;
+    background: $color-success-soft;
+  }
+
+  &__focus-item,
+  &__strength-item,
+  &__recommendation {
+    padding: 0.85rem 1rem;
+    font-size: 0.95rem;
+    line-height: 1.65;
+  }
+
+  &__section-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: $color-violet-soft;
+    color: $color-violet;
+    flex-shrink: 0;
+  }
+
+  &__bundle-item {
+    @include button-reset;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: start;
+    gap: $space-4;
+    width: 100%;
+    padding: $space-4;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+
+    &:hover {
+      border-color: $color-border-strong;
+      background: $color-surface-raised;
+      transform: translateY(-1px);
+    }
+  }
+
+  &__bundle-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-2;
+  }
+
+  &__bundle-arrow {
+    color: $color-text-soft;
+    margin-top: $space-1;
+  }
+
+  &__signal-card {
+    padding: $space-5;
+  }
+
+  &__card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-2;
+    margin-top: $space-4;
+  }
+
+  &__modal-meta {
+    align-items: center;
+    margin-bottom: $space-4;
+  }
+}

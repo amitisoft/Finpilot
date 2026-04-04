@@ -1,0 +1,316 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+.finance-page {
+  display: grid;
+  gap: $space-6;
+
+  &__feedback {
+    color: $color-danger;
+    background: $color-danger-soft;
+    border-color: rgba(195, 62, 77, 0.18);
+  }
+
+  &__grid {
+    display: grid;
+    gap: $space-6;
+
+    @media (min-width: 1280px) {
+      grid-template-columns: minmax(0, 1.25fr) minmax(340px, 0.75fr);
+    }
+
+    &--wide-right {
+      @media (min-width: 1280px) {
+        grid-template-columns: minmax(0, 1.2fr) minmax(380px, 0.8fr);
+      }
+    }
+
+    &--goals {
+      @media (min-width: 1280px) {
+        grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
+      }
+    }
+  }
+
+  &__stack {
+    display: grid;
+    gap: $space-6;
+  }
+
+  &__cards {
+    display: grid;
+    gap: $space-4;
+
+    @media (min-width: 760px) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    &--compact {
+      @media (min-width: 1320px) {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+  }
+
+  &__empty {
+    min-height: 260px;
+    display: flex;
+    align-items: center;
+  }
+
+  &__editor {
+    height: fit-content;
+  }
+
+  &__card,
+  &__stat-card,
+  &__item-panel,
+  &__table-row,
+  &__table-head,
+  &__search,
+  &__status-banner {
+    border: 1px solid $color-border;
+    border-radius: $radius-card;
+    background: $color-surface-alt;
+  }
+
+  &__card,
+  &__stat-card,
+  &__item-panel,
+  &__table-row,
+  &__status-banner {
+    padding: $space-5;
+  }
+
+  &__card {
+    position: relative;
+    overflow: hidden;
+  }
+
+  &__card-header,
+  &__card-top,
+  &__toolbar,
+  &__item-header,
+  &__table-head,
+  &__table-actions,
+  &__status-banner {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: $space-3;
+  }
+
+  &__card-icon,
+  &__status-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    background: $color-surface;
+    color: $color-text;
+    box-shadow: $shadow-card;
+  }
+
+  &__card-eyebrow,
+  &__table-head,
+  &__helper-label {
+    @include eyebrow;
+  }
+
+  &__card-title {
+    margin: $space-4 0 0;
+    font-size: 1.55rem;
+    line-height: 1.1;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    color: $color-text;
+  }
+
+  &__card-subtitle,
+  &__helper-text,
+  &__meta,
+  &__table-meta,
+  &__card-note,
+  &__search-text {
+    margin: $space-2 0 0;
+    color: $color-text-muted;
+    line-height: 1.7;
+    font-size: 0.92rem;
+  }
+
+  &__card-value {
+    margin: $space-4 0 0;
+    font-size: 2.35rem;
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    color: $color-text;
+  }
+
+  &__card-actions,
+  &__action-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-2;
+    margin-top: $space-5;
+  }
+
+  &__form {
+    display: grid;
+    gap: $space-4;
+  }
+
+  &__split {
+    display: grid;
+    gap: $space-4;
+
+    @media (min-width: 760px) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  &__progress {
+    width: 100%;
+    height: 10px;
+    overflow: hidden;
+    border-radius: $radius-pill;
+    background: $color-border;
+  }
+
+  &__progress-fill {
+    height: 100%;
+    border-radius: $radius-pill;
+    background: linear-gradient(90deg, #203fae 0%, #6b79eb 100%);
+
+    &--success {
+      background: linear-gradient(90deg, #2d8a63 0%, #46b386 100%);
+    }
+
+    &--warning {
+      background: linear-gradient(90deg, #d38b1d 0%, #f0b248 100%);
+    }
+
+    &--danger {
+      background: linear-gradient(90deg, #c33e4d 0%, #de6a78 100%);
+    }
+  }
+
+  &__search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    padding: 0 $space-4;
+  }
+
+  &__search-icon {
+    color: $color-text-soft;
+    flex-shrink: 0;
+  }
+
+  &__search-input {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    padding: 1rem 0;
+    color: $color-text;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  &__table {
+    overflow: hidden;
+    border: 1px solid $color-border;
+    border-radius: $radius-card;
+    background: $color-surface;
+  }
+
+  &__table-head {
+    padding: $space-4;
+    background: $color-surface-alt;
+    color: $color-text-soft;
+  }
+
+  &__table-grid,
+  &__table-head-grid {
+    display: grid;
+    gap: $space-3;
+  }
+
+
+  &__table-head-grid--transactions,
+  &__table-grid--transactions {
+    grid-template-columns: 110px minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr) 120px 112px;
+  }
+
+  &__table-row {
+    border-radius: 0;
+    border-left: 0;
+    border-right: 0;
+    border-top: 0;
+    background: $color-surface;
+
+    &--flagged {
+      background: rgba(255, 241, 243, 0.7);
+    }
+  }
+
+  &__table-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: $color-text;
+  }
+
+  &__table-cell {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+  }
+
+  &__item-list {
+    display: grid;
+    gap: $space-3;
+    margin-top: $space-4;
+  }
+
+  &__item-stats {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-3;
+    margin-top: $space-3;
+    color: $color-text-muted;
+    font-size: 0.82rem;
+  }
+
+  &__item-grid {
+    display: grid;
+    gap: $space-3;
+
+    @media (min-width: 760px) {
+      grid-template-columns: minmax(0, 1fr) 140px 52px;
+    }
+  }
+
+  &__goal-watermark {
+    position: absolute;
+    top: $space-5;
+    right: $space-5;
+    width: 80px;
+    height: 80px;
+    color: rgba(23, 32, 51, 0.08);
+  }
+
+  &__muted-button {
+    color: $color-text-muted;
+  }
+
+  &__danger-button {
+    color: $color-danger;
+  }
+}
